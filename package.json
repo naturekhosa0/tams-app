@@ -1,0 +1,32 @@
+{
+  "name": "tams-app",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Traditional Authority Management System (TAMS) \u2014 foundation: staff accounts, roles and authentication.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -b",
+    "test": "node --test tests/*.test.ts",
+    "test:db": "bash supabase/tests/run-db-tests.sh",
+    "test:all": "npm run typecheck && npm test && npm run test:db",
+    "db:push": "supabase db push",
+    "functions:deploy": "supabase functions deploy bootstrap-council-administrator create-staff-account"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.26.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "supabase": "^2.117.0",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
+  }
+}
