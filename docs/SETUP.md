@@ -37,6 +37,12 @@ That applies both migrations:
   allocations) and the one-time legacy import.
 * `20260922090000_registry_clerk.sql` — the Registry Clerk's read
   access and the functions behind every change they make.
+* `20260923090000_relationship_history.sql` — when a relationship began
+  and ended, and the change from one relationship per pair to one
+  *current* relationship per pair.
+* `20260924090000_resident_accounts.sql` — resident accounts,
+  verification requests, their documents, and the private storage
+  bucket the documents live in.
 
 If a page reports that a function is "not found in the schema cache", a
 migration has not reached the project yet — run
@@ -49,9 +55,12 @@ a one-time command — see [LEGACY-IMPORT.md](LEGACY-IMPORT.md).
 
 ## 3. Sign-in settings
 
-In **Authentication → Providers → Email**, turn **off** "Enable sign-ups".
-Staff accounts are only ever created by the Council Administrator, so
-there must be no public sign-up.
+In **Authentication → Providers → Email**, leave **Enable sign-ups**
+**on** and turn **Confirm email** on. Residents create their own
+sign-ins and confirm their address; that only ever produces a resident
+account, pending verification, with no access to anything. Staff
+accounts are still created solely by the Council Administrator's
+invitation, and nothing a member of the public can do produces one.
 
 In **Authentication → URL Configuration**, set the **Site URL** to where
 the app runs (`http://localhost:5173` while developing) and add
@@ -94,6 +103,9 @@ password. Fine for a handful of staff; use a real provider for more.
 
 Afterwards, raise the invite allowance under **Authentication → Rate
 Limits** if you plan to create several accounts in one sitting.
+
+Add `<site-url>/resident` to the **Redirect URLs** as well: that is
+where a resident's confirmation email returns them.
 
 Invitation links land on `/set-password`, a route inside the app. When
 you host TAMS somewhere, make sure unknown paths serve `index.html`
@@ -208,6 +220,40 @@ await fetch(`${SUPABASE_URL}/functions/v1/manage-staff-account`, {
 The same request with `action: "change_role"` and the Council
 Administrator's role id is refused too, as is any attempt to act on the
 Council Administrator's own account.
+
+### Checking resident accounts end to end
+
+| # | Check | Expected |
+| --- | --- | --- |
+| 27 | Register at `/register` with a new email | "Check your email"; a confirmation arrives |
+| 28 | Confirm, then sign in | The resident portal, status **Pending**, nothing else reachable |
+| 29 | Look for the person in Supabase → residents | Nothing was added to the register |
+| 30 | Register again with the same email | "An account with this email may already exist" — no second account |
+| 31 | Send verification with a 3 MB file | Refused before anything is submitted |
+| 32 | Send verification with a .docx | Refused |
+| 33 | Send valid details and both documents | Status stays **Pending**, now showing the submitted date |
+| 34 | Try to send a second request | Refused: one is already waiting |
+| 35 | As Registry Clerk, open **Resident accounts** | The application is listed |
+| 36 | Open it | Claimed details on the left, likely matches on the right, both documents with **View** |
+| 37 | Click **View** on a document | Opens; the link stops working after two minutes |
+| 38 | Approve against a resident with no household | Refused, telling you to link the household first |
+| 39 | Approve against a valid resident | Account becomes **Active** and linked |
+| 40 | Check that resident's record on the register | Unchanged — nothing the applicant typed was copied in |
+| 41 | Decline another application without a reason | Refused |
+| 42 | Decline with a reason | Applicant's account becomes **Declined** |
+| 43 | Sign in as the declined applicant | Sees the reason and an **Apply again** button |
+| 44 | Apply again with corrected details | New request created; the declined one still on record; same account, same sign-in |
+| 45 | As a Land Officer, open `/registry/resident-accounts` | Sent away; the API returns `403` |
+
+### Checking relationship history
+
+| # | Check | Expected |
+| --- | --- | --- |
+| 46 | Open a resident's family lineage | Three sections: lineage, current, former |
+| 47 | Look at a parent or sibling | No **End** button — lineage is permanent |
+| 48 | Record a spouse without a date | Refused; a start date is required |
+| 49 | Record a spouse with a start date, then **End** it | Moves to **Former spouse**, with both dates, on both people |
+| 50 | Record the same spouse again with a later date | A second episode; the first stays under Former |
 
 ### If the invitation email fails
 

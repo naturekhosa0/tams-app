@@ -22,6 +22,8 @@ later functions will stand on.
 | **Deactivate / reactivate** | Access is withdrawn and given back, with a reason, without deleting anything. |
 | **Legacy village import** | A one-time command loads the village's existing sites, residents, households, family relationships and land allocations. |
 | **Registry Clerk** | Search and view the register, create and update residents, create households, link residents, designate heads, and record family relationships. |
+| **Relationship history** | Lineage is permanent; marriages and guardianships begin, end and may begin again, each episode kept. |
+| **Resident accounts** | Residents register, send documents to be verified, and are matched by a Registry Clerk to a record already on the register. |
 
 ## Getting started
 
@@ -94,14 +96,15 @@ allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
 ```
 src/                      React app (pages, session, guards)
 supabase/migrations/      the foundation, staff management, village records,
-                          registry clerk
+                          registry clerk, relationship history, resident accounts
 data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
                           manage-staff-account
 supabase/tests/           database test suite (runs on plain PostgreSQL)
 tests/                    edge function rule tests
 scripts/                  one-time administrator bootstrap, legacy import
-docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md
+docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
+                          REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md
 ```
 
 ## Tests
@@ -110,4 +113,4 @@ docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md
 npm run test:all
 ```
 
-325 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+413 automated checks: see [docs/TESTING.md](docs/TESTING.md).

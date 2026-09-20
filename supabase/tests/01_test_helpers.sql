@@ -62,6 +62,6 @@ end;
 $$;
 
 create function tams_test.uid_of(p_email text)
-returns uuid language sql stable as $$
+returns uuid language sql stable security definer as $$
   select id from auth.users where email = p_email;
 $$;

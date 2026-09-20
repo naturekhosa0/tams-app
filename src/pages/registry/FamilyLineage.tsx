@@ -3,8 +3,8 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import { Field, Loading, Notice } from "../../components/ui";
 import { LineageList } from "./LineageList";
-import { RecordRelationshipDialog } from "./dialogs";
-import { familyLineage, residentRecord, searchResidents, setRelationshipStatus } from "../../registry/api";
+import { EndRelationshipDialog, RecordRelationshipDialog } from "./dialogs";
+import { familyLineage, residentRecord, searchResidents } from "../../registry/api";
 import type { LineageRow, ResidentRecord, ResidentSearchRow } from "../../registry/types";
 
 /**
@@ -22,6 +22,7 @@ export function FamilyLineage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
+  const [ending, setEnding] = useState<LineageRow | null>(null);
   const [loading, setLoading] = useState(Boolean(residentId));
 
   const load = useCallback(async () => {
@@ -48,16 +49,6 @@ export function FamilyLineage() {
     }, 250);
     return () => window.clearTimeout(timer);
   }, [search, residentId]);
-
-  async function retire(row: LineageRow) {
-    const result = await setRelationshipStatus(row.relationship_id, "inactive");
-    if (!result.ok) { setError(result.message); return; }
-    setSuccess(
-      `${row.related_full_name} is no longer recorded as a current ${row.relationship_type}. ` +
-        "The relationship is kept on record.",
-    );
-    await load();
-  }
 
   // ---- no resident chosen yet: pick one ------------------------------
   if (!residentId) {
@@ -129,12 +120,27 @@ export function FamilyLineage() {
 
       <div className="card">
         <h2 className="card-title">Related to</h2>
-        <LineageList residentName={record.full_name} rows={rows} onRetire={(row) => void retire(row)} />
+        <LineageList residentName={record.full_name} rows={rows} onEnd={(row) => setEnding(row)} />
         <p className="muted-note" style={{ marginTop: 20 }}>
-          Relationships are never deleted. One that is no longer current is marked so and kept
-          on record, together with the matching relationship the other way round.
+          Lineage is permanent and is never ended: a parent remains a parent. A marriage or a
+          guardianship can end, and can begin again later as a new one — nothing is ever deleted.
         </p>
       </div>
+
+      {ending
+        ? (
+          <EndRelationshipDialog
+            residentName={record.full_name}
+            row={ending}
+            onClose={() => setEnding(null)}
+            onDone={async (message: string) => {
+              setEnding(null);
+              setSuccess(message);
+              await load();
+            }}
+          />
+        )
+        : null}
 
       {recording
         ? (

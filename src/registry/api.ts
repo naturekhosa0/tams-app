@@ -8,8 +8,9 @@
 
 import { supabase } from "../lib/supabaseClient";
 import type {
-  AvailableSite, HouseholdRecord, HouseholdSearchRow, LineageRow,
-  RegistryStats, RelationshipType, ResidentRecord, ResidentSearchRow, ResidentStatus,
+  AvailableSite, CandidateRow, HouseholdRecord, HouseholdSearchRow, LineageRow,
+  PendingRequestRow, RegistryStats, RelationshipType, ResidentRecord,
+  ResidentRequestDetail, ResidentSearchRow, ResidentStatus,
 } from "./types";
 
 export type RegistryResult<T> =
@@ -159,15 +160,43 @@ export const recordFamilyRelationship = (
   residentId: string,
   relatedResidentId: string,
   relationshipType: RelationshipType,
+  /** Required for a marriage or a guardianship; lineage has no start. */
+  startedAt: string | null = null,
 ) =>
-  call<{ relationship_type: string; inverse_type: string }>("registry_record_family_relationship", {
-    p_resident_id: residentId,
-    p_related_resident_id: relatedResidentId,
-    p_relationship_type: relationshipType,
+  call<{ relationship_type: string; inverse_type: string; started_at: string | null }>(
+    "registry_record_family_relationship", {
+      p_resident_id: residentId,
+      p_related_resident_id: relatedResidentId,
+      p_relationship_type: relationshipType,
+      p_started_at: startedAt || null,
+    });
+
+/** Ends this episode and the matching one the other way round. */
+export const endFamilyRelationship = (relationshipId: string, endedAt: string) =>
+  call<{ relationship_type: string; ended_at: string }>("registry_end_family_relationship", {
+    p_relationship_id: relationshipId,
+    p_ended_at: endedAt,
   });
 
-export const setRelationshipStatus = (relationshipId: string, status: "active" | "inactive") =>
-  call<{ relationship_status: string }>("registry_set_relationship_status", {
-    p_relationship_id: relationshipId,
-    p_status: status,
+// ---- resident account verification ----------------------------------
+
+export const pendingResidentRequests = () =>
+  call<PendingRequestRow[]>("registry_pending_resident_requests");
+
+export const residentRequest = (requestId: string) =>
+  call<ResidentRequestDetail>("registry_resident_request", { p_request_id: requestId });
+
+export const residentCandidates = (requestId: string) =>
+  call<CandidateRow[]>("registry_resident_candidates", { p_request_id: requestId });
+
+export const approveResidentRequest = (requestId: string, residentId: string) =>
+  call<{ resident_name: string; household_code: string }>("registry_approve_resident_request", {
+    p_request_id: requestId,
+    p_resident_id: residentId,
+  });
+
+export const declineResidentRequest = (requestId: string, reason: string) =>
+  call<{ decline_reason: string }>("registry_decline_resident_request", {
+    p_request_id: requestId,
+    p_reason: reason,
   });

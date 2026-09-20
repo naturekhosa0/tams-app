@@ -36,6 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <NavLink to="/registry/residents" className={({ isActive }) => isActive ? "active" : ""}>Residents</NavLink>
                 <NavLink to="/registry/households" className={({ isActive }) => isActive ? "active" : ""}>Households</NavLink>
                 <NavLink to="/registry/lineage" className={({ isActive }) => isActive ? "active" : ""}>Family lineage</NavLink>
+                <NavLink to="/registry/resident-accounts" className={({ isActive }) => isActive ? "active" : ""}>Resident accounts</NavLink>
                 <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
               </>
             )

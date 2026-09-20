@@ -4,7 +4,7 @@
 npm run test:all        # typecheck + edge function rules + database rules
 ```
 
-## `npm test` — the edge function, import and lineage rules (85 tests)
+## `npm test` — the edge function, import and lineage rules (91 tests)
 
 Each edge function keeps its decisions in a `handler.ts` that takes
 everything it needs through a small set of ports, so the rules can be
@@ -31,9 +31,12 @@ run without Deno or a Supabase project. `tests/` covers:
 * which way round a family relationship reads — a stored `parent` row
   means the people listed are that resident's *children*, and showing it
   the other way round would file someone's grandchildren under
-  "Grandparents".
+  "Grandparents";
+* which relationships are permanent and which are episodes, so that
+  lineage is never offered an ending and a remarriage shows both the
+  current marriage and the former one.
 
-## `npm run test:db` — the database rules (240 tests)
+## `npm run test:db` — the database rules (322 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -64,6 +67,13 @@ Two suites, both of which read as a list of the rules themselves:
   inverses, and who may do any of it: a Land Officer, a Council
   Secretary, the Council Administrator, a signed-out visitor and a
   deactivated Registry Clerk are each turned away.
+* `06_relationship_history_tests.sql` — permanent lineage refusing to be
+  ended, marriages and guardianships ending on both sides, a remarriage
+  becoming a new episode while the first stays on record, and the 200
+  imported relationships untouched.
+* `07_resident_accounts_tests.sql` — registration, documents, one
+  pending request at a time, the Registry Clerk's review, approval,
+  decline, and reapplying with the same account and the same sign-in.
 * `04_legacy_import_tests.sql` — the legacy import. Every validation is
   given a dataset that breaks exactly one rule, and each one must write
   nothing at all; then the real CSV package is imported through the same

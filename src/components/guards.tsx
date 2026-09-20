@@ -41,3 +41,15 @@ export function RequireRegistryClerk({ children }: { children: ReactNode }) {
   if (profile.role_name !== "Registry Clerk") return <Navigate to={homePathFor(profile)} replace />;
   return <>{children}</>;
 }
+
+/** Requires a signed-in resident account, whatever its verification. */
+export function RequireResident({ children }: { children: ReactNode }) {
+  const { loading, session, profile } = useSession();
+  const location = useLocation();
+
+  if (loading) return <Loading what="Checking your account" />;
+  if (!session) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
+  // A staff member who wanders in is sent to their own area.
+  if (profile && profile.account_type !== "resident") return <Navigate to={homePathFor(profile)} replace />;
+  return <>{children}</>;
+}

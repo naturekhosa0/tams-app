@@ -129,6 +129,9 @@ export function useSession(): SessionState {
 
 /** Where a signed-in user belongs, decided by their role in the database. */
 export function homePathFor(profile: StaffContext | null): string {
+  // A resident account is not staff and never has access_granted: where
+  // it goes depends on its verification, which the portal shows.
+  if (profile?.account_type === "resident") return "/resident";
   if (!profile || !profile.access_granted) return "/no-access";
   if (profile.is_council_administrator) return "/dashboard";
   if (profile.role_name === "Registry Clerk") return "/registry";
