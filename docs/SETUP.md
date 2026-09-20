@@ -32,9 +32,14 @@ That applies both migrations:
 * `20260920100000_staff_role_and_status_management.sql` — the columns
   recording who deactivated or reactivated an account, when and why,
   and the three staff management functions.
+* `20260921090000_village_records.sql` — the village's own records
+  (land sites, residents, households, family relationships, land
+  allocations) and the one-time legacy import.
 
-If your project is already running the foundation, `db:push` applies
-only the second one.
+`db:push` applies only the migrations your project has not seen yet.
+
+Once the database is up, the village's existing records are loaded with
+a one-time command — see [LEGACY-IMPORT.md](LEGACY-IMPORT.md).
 
 ## 3. Sign-in settings
 

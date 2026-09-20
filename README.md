@@ -20,6 +20,7 @@ later functions will stand on.
 | **Staff sign-in** | All three roles can sign in and see their own account page. |
 | **Change staff role** | The Council Administrator moves a staff member to a different one of the three ordinary roles. |
 | **Deactivate / reactivate** | Access is withdrawn and given back, with a reason, without deleting anything. |
+| **Legacy village import** | A one-time command loads the village's existing sites, residents, households, family relationships and land allocations. |
 
 ## Getting started
 
@@ -38,6 +39,9 @@ Three tables, and nothing that is not needed yet.
 
 ```
 roles ───< staff ───< user_accounts >─── auth.users
+
+land_sites ───< households ───< residents ───< family_relationships
+     └───< land_allocations >─── residents
 ```
 
 * **roles** — the four roles, seeded by the migration: Registry Clerk,
@@ -50,6 +54,13 @@ roles ───< staff ───< user_accounts >─── auth.users
 
 `user_accounts.resident_id` is reserved for a later function and is
 unused.
+
+The village records came from the legacy import and are not yet reachable
+from the application: Row Level Security is on for all five tables with no
+policies, pending the Registry Clerk and Land Officer functions. A
+household is identified by its `household_code`, never by surname, and
+the head of a household is not assumed to be the person the land was
+allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
 
 ## How it is kept safe
 
@@ -79,13 +90,14 @@ unused.
 
 ```
 src/                      React app (pages, session, guards)
-supabase/migrations/      the foundation, then staff management
+supabase/migrations/      the foundation, staff management, village records
+data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
                           manage-staff-account
 supabase/tests/           database test suite (runs on plain PostgreSQL)
 tests/                    edge function rule tests
-scripts/                  one-time administrator bootstrap
-docs/                     SETUP.md, TESTING.md
+scripts/                  one-time administrator bootstrap, legacy import
+docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md
 ```
 
 ## Tests
@@ -94,4 +106,4 @@ docs/                     SETUP.md, TESTING.md
 npm run test:all
 ```
 
-166 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+233 automated checks: see [docs/TESTING.md](docs/TESTING.md).

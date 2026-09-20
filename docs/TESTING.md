@@ -4,7 +4,7 @@
 npm run test:all        # typecheck + edge function rules + database rules
 ```
 
-## `npm test` — the edge function rules (56 tests)
+## `npm test` — the edge function and import rules (76 tests)
 
 Each edge function keeps its decisions in a `handler.ts` that takes
 everything it needs through a small set of ports, so the rules can be
@@ -22,9 +22,14 @@ run without Deno or a Supabase project. `tests/` covers:
 * the bootstrap refusing a second Council Administrator;
 * for staff management: who may change a role, deactivate or reactivate,
   a reason being required and trimmed, and every refusal the database
-  can raise being turned into wording an administrator can act on.
+  can raise being turned into wording an administrator can act on;
+* the CSV reader — byte order marks, quoted values containing commas and
+  newlines, CRLF, short rows, unterminated quotes;
+* the legacy import payload: the supplied files read as expected, every
+  code they refer to exists, and columns with no home in the database
+  are reported rather than dropped.
 
-## `npm run test:db` — the database rules (110 tests)
+## `npm run test:db` — the database rules (157 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -49,6 +54,12 @@ Two suites, both of which read as a list of the rules themselves:
   reactivating: each rule, each refusal, and proof that a change of role
   or status leaves the staff record, the user account and the Auth
   identity otherwise untouched.
+* `04_legacy_import_tests.sql` — the legacy import. Every validation is
+  given a dataset that breaks exactly one rule, and each one must write
+  nothing at all; then the real CSV package is imported through the same
+  builder the real command uses; then the database's own constraints are
+  tried against the imported data, and Row Level Security is checked to
+  be refusing everyone.
 
 ## What still needs a Supabase project
 
