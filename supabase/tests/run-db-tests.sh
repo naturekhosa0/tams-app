@@ -43,5 +43,12 @@ su "$PSQL_USER" -c "psql -v ON_ERROR_STOP=1 -X -q -d '$DB_NAME' \
   -v payload_path='$PAYLOAD_DIR/payload.json' \
   -f '$ROOT/supabase/tests/04_legacy_import_tests.sql'"
 
+# Everything that runs against the imported register.
+for suite in "$ROOT"/supabase/tests/0[5-9]_*.sql; do
+  [ -e "$suite" ] || continue
+  echo "  $(basename "$suite")"
+  run_sql "$DB_NAME" "$suite"
+done
+
 # Prints every result and fails the run if anything failed.
 su "$PSQL_USER" -c "psql -v ON_ERROR_STOP=1 -X -d '$DB_NAME' -f '$ROOT/supabase/tests/99_report.sql'"
