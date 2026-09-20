@@ -201,12 +201,38 @@ test("an email that already has a sign-in account is reported clearly", async ()
 });
 
 test("a failed invitation stops the process", async () => {
-  const ports = makePorts({ inviteUser: async () => ({ error: { message: "SMTP unavailable" } }) });
+  const ports = makePorts({ inviteUser: async () => ({ error: { message: "connection refused" } }) });
   const result = await handleCreateStaffAccount({ ...VALID_FORM }, ports);
 
   assert.equal(result.status, 502);
+  assert.match(result.body.error?.message ?? "", /no staff account was created/i);
   assert.equal(ports.calls.created.length, 0);
   assert.equal(ports.calls.deleted.length, 0);
+});
+
+test("an email delivery failure explains itself and creates nothing", async () => {
+  // Exactly what Supabase Auth returns when it has no working mail server.
+  const ports = makePorts({
+    inviteUser: async () => ({ error: { message: "Error sending invite email" } }),
+  });
+  const result = await handleCreateStaffAccount({ ...VALID_FORM }, ports);
+
+  assert.equal(result.status, 502);
+  assert.match(result.body.error?.message ?? "", /no staff account was created/i);
+  assert.match(result.body.error?.message ?? "", /SMTP server/i);
+  assert.equal(ports.calls.created.length, 0);
+  assert.equal(ports.calls.deleted.length, 0);
+});
+
+test("an email rate limit is reported the same way", async () => {
+  const ports = makePorts({
+    inviteUser: async () => ({ error: { message: "email rate limit exceeded" } }),
+  });
+  const result = await handleCreateStaffAccount({ ...VALID_FORM }, ports);
+
+  assert.equal(result.status, 502);
+  assert.match(result.body.error?.message ?? "", /email limit has been reached/i);
+  assert.equal(ports.calls.created.length, 0);
 });
 
 test("the invited auth user is removed when the records cannot be written", async () => {

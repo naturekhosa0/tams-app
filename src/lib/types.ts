@@ -41,6 +41,17 @@ export type StaffAccountRow = {
   first_name: string;
   last_name: string;
   contact_number: string;
+  role_id: string;
   role_name: string;
   invitation_completed: boolean;
+  is_council_administrator: boolean;
+  last_deactivated_at: string | null;
+  last_deactivation_reason: string | null;
+  last_deactivated_by: string | null;
+  last_reactivated_at: string | null;
+  last_reactivation_reason: string | null;
+  last_reactivated_by: string | null;
 };
+
+/** The three things a Council Administrator can do to a staff account. */
+export type StaffAction = "change_role" | "deactivate" | "reactivate";

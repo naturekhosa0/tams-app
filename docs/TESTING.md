@@ -4,11 +4,11 @@
 npm run test:all        # typecheck + edge function rules + database rules
 ```
 
-## `npm test` — the edge function rules (30 tests)
+## `npm test` — the edge function rules (56 tests)
 
-The two edge functions keep their decisions in `handler.ts` files that
-take everything they need through a small set of ports, so the rules can
-be run without Deno or a Supabase project. `tests/` covers:
+Each edge function keeps its decisions in a `handler.ts` that takes
+everything it needs through a small set of ports, so the rules can be
+run without Deno or a Supabase project. `tests/` covers:
 
 * only the active Council Administrator may create staff;
 * a Council Administrator role id submitted by hand is refused, and no
@@ -19,9 +19,12 @@ be run without Deno or a Supabase project. `tests/` covers:
 * **rollback**: when the staff record cannot be written, the invited auth
   user is deleted again, so no auth user survives without its records;
 * the bootstrap secret: unset, wrong, missing;
-* the bootstrap refusing a second Council Administrator.
+* the bootstrap refusing a second Council Administrator;
+* for staff management: who may change a role, deactivate or reactivate,
+  a reason being required and trimmed, and every refusal the database
+  can raise being turned into wording an administrator can act on.
 
-## `npm run test:db` — the database rules (62 tests)
+## `npm run test:db` — the database rules (110 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -36,11 +39,16 @@ pg_ctlcluster 16 main start     # Debian/Ubuntu
 npm run test:db
 ```
 
-The suite covers the first administrator bootstrap, staff creation and
-everything it refuses, Row Level Security for administrators, ordinary
-staff and signed-out visitors, and `account_status` as the single source
-of truth for access. `supabase/tests/02_foundation_tests.sql` reads as a
-list of the rules themselves.
+Two suites, both of which read as a list of the rules themselves:
+
+* `02_foundation_tests.sql` — the first administrator bootstrap, staff
+  creation and everything it refuses, Row Level Security for
+  administrators, ordinary staff and signed-out visitors, and
+  `account_status` as the single source of truth for access.
+* `03_staff_management_tests.sql` — changing a role, deactivating and
+  reactivating: each rule, each refusal, and proof that a change of role
+  or status leaves the staff record, the user account and the Auth
+  identity otherwise untouched.
 
 ## What still needs a Supabase project
 

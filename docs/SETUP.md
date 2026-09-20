@@ -25,9 +25,16 @@ npx supabase link --project-ref <your-project-ref>
 npm run db:push
 ```
 
-That applies `supabase/migrations/20260919090000_tams_foundation.sql`,
-which creates the three tables, seeds the four roles, and turns on Row
-Level Security.
+That applies both migrations:
+
+* `20260919090000_tams_foundation.sql` — the three tables, the four
+  seeded roles, and Row Level Security.
+* `20260920100000_staff_role_and_status_management.sql` — the columns
+  recording who deactivated or reactivated an account, when and why,
+  and the three staff management functions.
+
+If your project is already running the foundation, `db:push` applies
+only the second one.
 
 ## 3. Sign-in settings
 
@@ -40,9 +47,42 @@ the app runs (`http://localhost:5173` while developing) and add
 `<site-url>/set-password` to the **Redirect URLs**. That is where
 invitation emails land.
 
-While developing, Supabase's built-in email service only delivers to a
-small number of addresses per hour. For real use, set up SMTP under
-**Project Settings → Authentication → SMTP Settings**.
+### Email delivery — set this up before creating any staff
+
+**Staff creation fails without it.** Supabase's built-in email service is
+for demonstration only: it is heavily rate limited and it refuses
+addresses that do not belong to your own Supabase team. Inviting anyone
+else comes back as:
+
+> The invitation email could not be sent, so no staff account was
+> created.
+
+Nothing is created when that happens, so it is safe to fix the mail
+settings and create the account again.
+
+Set up your own SMTP server under **Project Settings → Authentication →
+SMTP Settings**. Any provider works. Two that need no domain of your own:
+
+**Brevo** (300 emails a day, free) — sign up, verify the sender address
+you want mail to come from (your own Gmail address is fine), then under
+**SMTP & API → SMTP** take:
+
+| Field | Value |
+| --- | --- |
+| Host | `smtp-relay.brevo.com` |
+| Port | `587` |
+| Username | the login Brevo shows you |
+| Password | the SMTP key Brevo generates |
+| Sender email | the address you verified |
+| Sender name | e.g. `TAMS` |
+
+**Gmail** — in your Google account, turn on 2-Step Verification, create an
+**App password**, then use host `smtp.gmail.com`, port `465`, your Gmail
+address as the username, and the 16-character app password as the
+password. Fine for a handful of staff; use a real provider for more.
+
+Afterwards, raise the invite allowance under **Authentication → Rate
+Limits** if you plan to create several accounts in one sitting.
 
 Invitation links land on `/set-password`, a route inside the app. When
 you host TAMS somewhere, make sure unknown paths serve `index.html`
@@ -122,6 +162,53 @@ see [TESTING.md](TESTING.md) — and `npm run test:all` runs them.
 | 13 | As a Registry Clerk, open `/staff/new` | Sent back to their own account page |
 | 14 | As a Registry Clerk, POST to the `create-staff-account` function | `403` |
 | 15 | Set someone's `account_status` to `deactivated`, then sign in as them | "Your staff account has been deactivated" |
+
+### Checking staff management
+
+| # | Check | Expected |
+| --- | --- | --- |
+| 16 | As the administrator, open Staff accounts | Active staff show **Change role** and **Deactivate**; deactivated staff show **Reactivate**; your own row shows "Managed separately" |
+| 17 | Change a Registry Clerk to Land Officer | Saved; the row shows the new role at once |
+| 18 | Change them to the role they already hold | "That staff member already holds the role you chose" |
+| 19 | Sign in as that staff member | Their account page shows the **new** role |
+| 20 | Deactivate a staff member without a reason | Refused; the reason is required |
+| 21 | Deactivate them with a reason | Row shows **Deactivated**, the date and the reason; their role is unchanged |
+| 22 | While they are signed in elsewhere, deactivate them | Within a minute — or the moment they return to the tab — they are sent to "Your staff account has been deactivated" |
+| 23 | Try to sign in as them | They reach the same refusal, not the system |
+| 24 | Reactivate them with a reason | Row shows **Active** again; same employee number, email and role |
+| 25 | Sign in as them again | Same password as before; their account page works |
+| 26 | As an ordinary staff member, call the function by hand (below) | `403` |
+
+For 26, from a signed-in Registry Clerk's browser console:
+
+```js
+const { data: { session } } = await supabase.auth.getSession();
+await fetch(`${SUPABASE_URL}/functions/v1/manage-staff-account`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    apikey: ANON_KEY,
+    Authorization: `Bearer ${session.access_token}`,
+  },
+  body: JSON.stringify({ action: "deactivate", staff_id: "<any staff id>", reason: "test" }),
+}).then((response) => response.status);   // 403
+```
+
+The same request with `action: "change_role"` and the Council
+Administrator's role id is refused too, as is any attempt to act on the
+Council Administrator's own account.
+
+### If the invitation email fails
+
+The message says no staff account was created, and none was: the staff
+record and user account are only written after the invitation has been
+accepted for delivery. Fix the SMTP settings above and create the
+account again with the same details.
+
+One thing to check afterwards: if the second attempt says *"That email
+address already has a sign-in account"*, a sign-in user was left behind
+by the failed attempt. Remove it under **Authentication → Users**, then
+create the staff account again.
 
 For 14, from a signed-in Registry Clerk's browser console:
 
