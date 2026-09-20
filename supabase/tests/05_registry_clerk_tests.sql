@@ -327,9 +327,9 @@ select tams_test.run_as('service_role', null, $sql$
   insert into public.land_sites (site_code, site_type, stand_number, street_address,
                                  village_section, village_name, site_status)
   values ('RES-0021', 'residential', 'ST-1021', '73 Baobab Close', 'Central',
-          'Mahlasedi Village (Synthetic)', 'allocated'),
+          'Mhinga Village', 'allocated'),
          ('GRAZE-001', 'grazing', null, 'Common grazing land', 'North',
-          'Mahlasedi Village (Synthetic)', 'allocated')
+          'Mhinga Village', 'allocated')
 $sql$);
 
 select tams_test.check(

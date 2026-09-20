@@ -109,7 +109,7 @@ test("columns the database has no home for are reported, not imported", async ()
     await writeFile(
       join(directory, "land_sites.csv"),
       "site_code,site_type,stand_number,street_address,village_section,village_name,site_status,notes,data_source\n" +
-        "RES-0001,residential,ST-1001,13 Marula Street,Central,Mahlasedi,allocated,some note,a spreadsheet\n",
+        "RES-0001,residential,ST-1001,13 Marula Street,Central,Mhinga Village,allocated,some note,a spreadsheet\n",
     );
     const { payload, summary } = await buildImportPayload(directory);
     const sites = summary.find((file) => file.fileName === "land_sites.csv");
