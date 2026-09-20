@@ -491,10 +491,17 @@ select tams_test.check(
   tams_test.query_as('anon', null, 'select count(*)::text from public.residents') = 'ERROR:42501'
 );
 
+-- Row Level Security decides this, not a missing grant: the Council
+-- Administrator manages staff, not the village register, so the
+-- register returns nothing at all to them.
 select tams_test.check(
-  'RLS 2 — a signed-in staff member can read no village records yet',
+  'RLS 2 — the Council Administrator can read no village records',
   tams_test.query_as('authenticated', tams_test.uid_of('admin@ta.example'),
-    'select count(*)::text from public.residents') = 'ERROR:42501'
+    'select count(*)::text from public.residents') = '0'
+  and tams_test.query_as('authenticated', tams_test.uid_of('admin@ta.example'),
+    'select count(*)::text from public.households') = '0'
+  and tams_test.query_as('authenticated', tams_test.uid_of('admin@ta.example'),
+    'select count(*)::text from public.land_allocations') = '0'
 );
 
 select tams_test.check(

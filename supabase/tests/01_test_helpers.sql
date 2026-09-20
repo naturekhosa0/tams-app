@@ -3,6 +3,11 @@
 drop schema if exists tams_test cascade;
 create schema tams_test;
 
+-- Tests act as anon, authenticated and service_role, and their dynamic
+-- SQL reaches for these helpers, so the schema has to be visible to
+-- them. The helpers only ever read the test database.
+grant usage on schema tams_test to public;
+
 create table tams_test.results (
   id     serial primary key,
   name   text not null,

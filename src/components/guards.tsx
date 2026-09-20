@@ -29,3 +29,15 @@ export function RequireAdministrator({ children }: { children: ReactNode }) {
   if (!profile.is_council_administrator) return <Navigate to={homePathFor(profile)} replace />;
   return <>{children}</>;
 }
+
+/** Requires an active Registry Clerk. */
+export function RequireRegistryClerk({ children }: { children: ReactNode }) {
+  const { loading, session, profile } = useSession();
+  const location = useLocation();
+
+  if (loading) return <Loading what="Checking your account" />;
+  if (!session) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
+  if (!profile || !profile.access_granted) return <Navigate to="/no-access" replace />;
+  if (profile.role_name !== "Registry Clerk") return <Navigate to={homePathFor(profile)} replace />;
+  return <>{children}</>;
+}

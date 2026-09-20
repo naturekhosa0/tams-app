@@ -7,6 +7,7 @@ import { initialsOf } from "../lib/format";
 export function AppShell({ children }: { children: ReactNode }) {
   const { profile, signOut } = useSession();
   const isAdministrator = profile?.is_council_administrator ?? false;
+  const isRegistryClerk = profile?.role_name === "Registry Clerk";
 
   return (
     <div className="page">
@@ -26,6 +27,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
                 <NavLink to="/staff" end className={({ isActive }) => isActive ? "active" : ""}>Staff accounts</NavLink>
                 <NavLink to="/staff/new" className={({ isActive }) => isActive ? "active" : ""}>Create staff account</NavLink>
+              </>
+            )
+            : isRegistryClerk
+            ? (
+              <>
+                <NavLink to="/registry" end className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
+                <NavLink to="/registry/residents" className={({ isActive }) => isActive ? "active" : ""}>Residents</NavLink>
+                <NavLink to="/registry/households" className={({ isActive }) => isActive ? "active" : ""}>Households</NavLink>
+                <NavLink to="/registry/lineage" className={({ isActive }) => isActive ? "active" : ""}>Family lineage</NavLink>
+                <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
               </>
             )
             : <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>}

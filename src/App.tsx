@@ -1,6 +1,6 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./auth/SessionProvider";
-import { RequireAdministrator, RequireStaff } from "./components/guards";
+import { RequireAdministrator, RequireRegistryClerk, RequireStaff } from "./components/guards";
 import { isConfigured } from "./lib/supabaseClient";
 import { Landing } from "./pages/Landing";
 import { SignIn } from "./pages/SignIn";
@@ -10,6 +10,13 @@ import { StaffAccounts } from "./pages/StaffAccounts";
 import { CreateStaffAccount } from "./pages/CreateStaffAccount";
 import { StaffHome } from "./pages/StaffHome";
 import { NoAccess } from "./pages/NoAccess";
+import { RegistryDashboard } from "./pages/registry/RegistryDashboard";
+import { Residents } from "./pages/registry/Residents";
+import { ResidentDetail } from "./pages/registry/ResidentDetail";
+import { ResidentForm } from "./pages/registry/ResidentForm";
+import { Households } from "./pages/registry/Households";
+import { HouseholdDetail } from "./pages/registry/HouseholdDetail";
+import { FamilyLineage } from "./pages/registry/FamilyLineage";
 import { Notice } from "./components/ui";
 
 function NotConfigured() {
@@ -48,6 +55,17 @@ export default function App() {
           <Route path="/dashboard" element={<RequireAdministrator><AdminDashboard /></RequireAdministrator>} />
           <Route path="/staff" element={<RequireAdministrator><StaffAccounts /></RequireAdministrator>} />
           <Route path="/staff/new" element={<RequireAdministrator><CreateStaffAccount /></RequireAdministrator>} />
+
+          {/* The active Registry Clerk only */}
+          <Route path="/registry" element={<RequireRegistryClerk><RegistryDashboard /></RequireRegistryClerk>} />
+          <Route path="/registry/residents" element={<RequireRegistryClerk><Residents /></RequireRegistryClerk>} />
+          <Route path="/registry/residents/new" element={<RequireRegistryClerk><ResidentForm mode="create" /></RequireRegistryClerk>} />
+          <Route path="/registry/residents/:residentId" element={<RequireRegistryClerk><ResidentDetail /></RequireRegistryClerk>} />
+          <Route path="/registry/residents/:residentId/edit" element={<RequireRegistryClerk><ResidentForm mode="update" /></RequireRegistryClerk>} />
+          <Route path="/registry/households" element={<RequireRegistryClerk><Households /></RequireRegistryClerk>} />
+          <Route path="/registry/households/:householdId" element={<RequireRegistryClerk><HouseholdDetail /></RequireRegistryClerk>} />
+          <Route path="/registry/lineage" element={<RequireRegistryClerk><FamilyLineage /></RequireRegistryClerk>} />
+          <Route path="/registry/lineage/:residentId" element={<RequireRegistryClerk><FamilyLineage /></RequireRegistryClerk>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

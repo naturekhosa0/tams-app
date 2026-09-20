@@ -21,6 +21,7 @@ later functions will stand on.
 | **Change staff role** | The Council Administrator moves a staff member to a different one of the three ordinary roles. |
 | **Deactivate / reactivate** | Access is withdrawn and given back, with a reason, without deleting anything. |
 | **Legacy village import** | A one-time command loads the village's existing sites, residents, households, family relationships and land allocations. |
+| **Registry Clerk** | Search and view the register, create and update residents, create households, link residents, designate heads, and record family relationships. |
 
 ## Getting started
 
@@ -55,9 +56,11 @@ land_sites ───< households ───< residents ───< family_relation
 `user_accounts.resident_id` is reserved for a later function and is
 unused.
 
-The village records came from the legacy import and are not yet reachable
-from the application: Row Level Security is on for all five tables with no
-policies, pending the Registry Clerk and Land Officer functions. A
+The village records came from the legacy import. An active Registry Clerk
+may read all five tables and write to residents, households and family
+relationships through the `registry_*` functions; nobody else can read
+them at all, and nobody can change land sites or land allocations, which
+wait for the Land Officer. A
 household is identified by its `household_code`, never by surname, and
 the head of a household is not assumed to be the person the land was
 allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
@@ -90,7 +93,8 @@ allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
 
 ```
 src/                      React app (pages, session, guards)
-supabase/migrations/      the foundation, staff management, village records
+supabase/migrations/      the foundation, staff management, village records,
+                          registry clerk
 data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
                           manage-staff-account
@@ -106,4 +110,4 @@ docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md
 npm run test:all
 ```
 
-233 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+325 automated checks: see [docs/TESTING.md](docs/TESTING.md).
