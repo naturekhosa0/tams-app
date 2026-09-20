@@ -130,12 +130,28 @@ export async function handleCreateStaffAccount(
   });
 
   if ("error" in invitation) {
-    const alreadyRegistered = invitation.error.message.toLowerCase().includes("already");
-    return alreadyRegistered
-      ? fail(409, "That email address already has a sign-in account.", {
+    const reason = invitation.error.message;
+    const lowered = reason.toLowerCase();
+
+    if (lowered.includes("already")) {
+      return fail(409, "That email address already has a sign-in account.", {
         email: "That email address already has a sign-in account.",
-      })
-      : fail(502, `The invitation could not be sent: ${invitation.error.message}`);
+      });
+    }
+
+    // Supabase Auth could not hand the email to a mail server. Nothing has
+    // been created at this point, so the administrator can simply try
+    // again once email delivery works.
+    if (/sending .*(email|invite)|smtp|rate limit|too many requests/.test(lowered)) {
+      return fail(
+        502,
+        "The invitation email could not be sent, so no staff account was created. " +
+          "This usually means the project has no SMTP server set up yet, or its email " +
+          "limit has been reached. Set up email delivery and create the account again.",
+      );
+    }
+
+    return fail(502, `The invitation could not be sent, so no staff account was created: ${reason}`);
   }
 
   // ---- 6. Staff record + user account, or undo the invitation -------
