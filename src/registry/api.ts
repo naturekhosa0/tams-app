@@ -40,6 +40,20 @@ function failure(error: { code?: string; message: string }): RegistryResult<neve
       message: "Only an active Registry Clerk may do that. Ask the Council Administrator if this looks wrong.",
     };
   }
+
+  // PostgREST could not find the function it was asked for. The raw
+  // wording ("… in the schema cache") says nothing useful to whoever is
+  // looking at the screen, so say what it actually means.
+  if (error.code === "PGRST202") {
+    return {
+      ok: false,
+      code: "PGRST202",
+      message:
+        "This part of the system is not installed on the database yet. " +
+        "The Registry Clerk migration needs to be applied to the Supabase project " +
+        "(see docs/REGISTRY-CLERK.md). Nothing you did caused this.",
+    };
+  }
   return { ok: false, code: error.code ?? "unknown", message };
 }
 

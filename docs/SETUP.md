@@ -35,6 +35,12 @@ That applies both migrations:
 * `20260921090000_village_records.sql` — the village's own records
   (land sites, residents, households, family relationships, land
   allocations) and the one-time legacy import.
+* `20260922090000_registry_clerk.sql` — the Registry Clerk's read
+  access and the functions behind every change they make.
+
+If a page reports that a function is "not found in the schema cache", a
+migration has not reached the project yet — run
+`scripts/check-registry-functions.sql` in the SQL Editor to see which.
 
 `db:push` applies only the migrations your project has not seen yet.
 
