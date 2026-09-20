@@ -18,6 +18,9 @@ type SessionState = {
 
 const SessionContext = createContext<SessionState | undefined>(undefined);
 
+/** How often an open window re-checks that its account is still active. */
+const ACCESS_RECHECK_INTERVAL_MS = 60_000;
+
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [session, setSession] = useState<Session | null>(null);
@@ -65,6 +68,37 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       listener.subscription.unsubscribe();
     };
   }, [loadProfile]);
+
+  // Access can be taken away while someone is sitting on a page. Their
+  // browser is told nothing, so re-read the account from the database
+  // whenever the window is used again, and periodically while it is
+  // open. The moment account_status is no longer 'active', the route
+  // guards send them to /no-access.
+  //
+  // This is a courtesy, not the enforcement: a deactivated session can
+  // already read nothing and do nothing, because every protected
+  // function and every Row Level Security policy checks the live
+  // account_status for itself.
+  useEffect(() => {
+    if (!session) return;
+
+    let cancelled = false;
+    const revalidate = () => {
+      if (cancelled || document.visibilityState === "hidden") return;
+      void loadProfile(session);
+    };
+
+    window.addEventListener("focus", revalidate);
+    document.addEventListener("visibilitychange", revalidate);
+    const timer = window.setInterval(revalidate, ACCESS_RECHECK_INTERVAL_MS);
+
+    return () => {
+      cancelled = true;
+      window.removeEventListener("focus", revalidate);
+      document.removeEventListener("visibilitychange", revalidate);
+      window.clearInterval(timer);
+    };
+  }, [session, loadProfile]);
 
   const refresh = useCallback(async () => {
     const { data } = await supabase.auth.getSession();

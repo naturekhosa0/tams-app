@@ -25,9 +25,16 @@ npx supabase link --project-ref <your-project-ref>
 npm run db:push
 ```
 
-That applies `supabase/migrations/20260919090000_tams_foundation.sql`,
-which creates the three tables, seeds the four roles, and turns on Row
-Level Security.
+That applies both migrations:
+
+* `20260919090000_tams_foundation.sql` — the three tables, the four
+  seeded roles, and Row Level Security.
+* `20260920100000_staff_role_and_status_management.sql` — the columns
+  recording who deactivated or reactivated an account, when and why,
+  and the three staff management functions.
+
+If your project is already running the foundation, `db:push` applies
+only the second one.
 
 ## 3. Sign-in settings
 
@@ -155,6 +162,41 @@ see [TESTING.md](TESTING.md) — and `npm run test:all` runs them.
 | 13 | As a Registry Clerk, open `/staff/new` | Sent back to their own account page |
 | 14 | As a Registry Clerk, POST to the `create-staff-account` function | `403` |
 | 15 | Set someone's `account_status` to `deactivated`, then sign in as them | "Your staff account has been deactivated" |
+
+### Checking staff management
+
+| # | Check | Expected |
+| --- | --- | --- |
+| 16 | As the administrator, open Staff accounts | Active staff show **Change role** and **Deactivate**; deactivated staff show **Reactivate**; your own row shows "Managed separately" |
+| 17 | Change a Registry Clerk to Land Officer | Saved; the row shows the new role at once |
+| 18 | Change them to the role they already hold | "That staff member already holds the role you chose" |
+| 19 | Sign in as that staff member | Their account page shows the **new** role |
+| 20 | Deactivate a staff member without a reason | Refused; the reason is required |
+| 21 | Deactivate them with a reason | Row shows **Deactivated**, the date and the reason; their role is unchanged |
+| 22 | While they are signed in elsewhere, deactivate them | Within a minute — or the moment they return to the tab — they are sent to "Your staff account has been deactivated" |
+| 23 | Try to sign in as them | They reach the same refusal, not the system |
+| 24 | Reactivate them with a reason | Row shows **Active** again; same employee number, email and role |
+| 25 | Sign in as them again | Same password as before; their account page works |
+| 26 | As an ordinary staff member, call the function by hand (below) | `403` |
+
+For 26, from a signed-in Registry Clerk's browser console:
+
+```js
+const { data: { session } } = await supabase.auth.getSession();
+await fetch(`${SUPABASE_URL}/functions/v1/manage-staff-account`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    apikey: ANON_KEY,
+    Authorization: `Bearer ${session.access_token}`,
+  },
+  body: JSON.stringify({ action: "deactivate", staff_id: "<any staff id>", reason: "test" }),
+}).then((response) => response.status);   // 403
+```
+
+The same request with `action: "change_role"` and the Council
+Administrator's role id is refused too, as is any attempt to act on the
+Council Administrator's own account.
 
 ### If the invitation email fails
 

@@ -1,36 +1,50 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useSession } from "../auth/SessionProvider";
 import { supabase } from "../lib/supabaseClient";
 import { AppShell } from "../components/AppShell";
+import { StaffActionDialog } from "../components/StaffActionDialog";
 import { Field, Loading, Notice, StatusBadge } from "../components/ui";
 import { formatDate } from "../lib/format";
-import type { StaffAccountRow } from "../lib/types";
+import type { AssignableRole, StaffAccountRow, StaffAction } from "../lib/types";
 
 /**
  * Every staff member, their single current role, and whether they can
- * currently reach the system. Read only for now — changing a role and
- * deactivating an account are separate functions, not yet built.
+ * currently reach the system.
+ *
+ * The actions shown here are a convenience. Which of them a person may
+ * actually carry out is decided on the server every time, so hiding a
+ * button is never what keeps an account safe.
  */
 export function StaffAccounts() {
   const { profile } = useSession();
   const [rows, setRows] = useState<StaffAccountRow[] | null>(null);
+  const [roles, setRoles] = useState<AssignableRole[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [openAction, setOpenAction] = useState<{ action: StaffAction; staff: StaffAccountRow } | null>(null);
+
+  // The list comes from a function that re-checks, in the database, that
+  // the caller is the active Council Administrator.
+  const load = useCallback(async () => {
+    const { data, error: queryError } = await supabase.rpc("admin_staff_accounts");
+    if (queryError) setError("The staff accounts could not be loaded.");
+    else {
+      setError(null);
+      setRows((data ?? []) as StaffAccountRow[]);
+    }
+  }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    // The list comes from a function that re-checks, in the database,
-    // that the caller is the active Council Administrator.
-    supabase.rpc("admin_staff_accounts").then(({ data, error: queryError }) => {
-      if (cancelled) return;
-      if (queryError) setError("The staff accounts could not be loaded.");
-      else setRows((data ?? []) as StaffAccountRow[]);
+    void load();
+    // The assignable roles never include Council Administrator.
+    supabase.rpc("assignable_staff_roles").then(({ data }) => {
+      setRoles((data ?? []) as AssignableRole[]);
     });
-    return () => { cancelled = true; };
-  }, []);
+  }, [load]);
 
   const roleNames = useMemo(
     () => [...new Set((rows ?? []).map((row) => row.role_name))].sort(),
@@ -49,6 +63,13 @@ export function StaffAccounts() {
     });
   }, [rows, search, roleFilter, statusFilter]);
 
+  async function handleDone(message: string) {
+    setOpenAction(null);
+    setSuccess(message);
+    // Straight back to the database, so the page shows what is now true.
+    await load();
+  }
+
   return (
     <AppShell>
       <div className="page-head">
@@ -57,6 +78,13 @@ export function StaffAccounts() {
       </div>
 
       {error ? <Notice kind="error">{error}</Notice> : null}
+      {success
+        ? (
+          <div style={{ marginBottom: 18 }}>
+            <Notice kind="success">{success}</Notice>
+          </div>
+        )
+        : null}
 
       <div className="card">
         <div className="row-between" style={{ marginBottom: 20 }}>
@@ -106,32 +134,78 @@ export function StaffAccounts() {
                     <th>Current role</th>
                     <th>Account status</th>
                     <th>Created</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {visible.length === 0
                     ? (
                       <tr>
-                        <td className="empty-row" colSpan={7}>No staff accounts match those filters.</td>
+                        <td className="empty-row" colSpan={8}>No staff accounts match those filters.</td>
                       </tr>
                     )
                     : visible.map((row) => (
                       <tr key={row.account_id}>
-                        <td>{row.employee_number}</td>
+                        <td className="no-wrap">{row.employee_number}</td>
                         <td>
                           <span className="name">{row.first_name} {row.last_name}</span>
                           {row.staff_id === profile?.staff_id ? <span className="self"> (you)</span> : null}
                         </td>
                         <td>{row.email}</td>
-                        <td>{row.contact_number}</td>
-                        <td>{row.role_name}</td>
+                        <td className="no-wrap">{row.contact_number}</td>
+                        <td className="no-wrap">{row.role_name}</td>
                         <td>
                           <StatusBadge status={row.account_status} />
-                          {!row.invitation_completed
-                            ? <div className="self">Invitation not completed</div>
+                          {row.account_status === "deactivated" && row.last_deactivated_at
+                            ? (
+                              <div className="status-note">
+                                Deactivated {formatDate(row.last_deactivated_at)}
+                                {row.last_deactivation_reason ? ` · ${row.last_deactivation_reason}` : ""}
+                              </div>
+                            )
+                            : null}
+                          {row.account_status === "active" && !row.invitation_completed
+                            ? <div className="status-note">Invitation not completed</div>
                             : null}
                         </td>
-                        <td>{formatDate(row.account_created_at)}</td>
+                        <td className="no-wrap">{formatDate(row.account_created_at)}</td>
+                        <td>
+                          {/* The Council Administrator is not managed from this page. */}
+                          {row.is_council_administrator
+                            ? <span className="muted-note">Managed separately</span>
+                            : (
+                              <div className="row-actions">
+                                {row.account_status === "active"
+                                  ? (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="btn btn-ghost btn-small"
+                                        onClick={() => setOpenAction({ action: "change_role", staff: row })}
+                                      >
+                                        Change role
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="btn btn-danger btn-small"
+                                        onClick={() => setOpenAction({ action: "deactivate", staff: row })}
+                                      >
+                                        Deactivate
+                                      </button>
+                                    </>
+                                  )
+                                  : (
+                                    <button
+                                      type="button"
+                                      className="btn btn-restore btn-small"
+                                      onClick={() => setOpenAction({ action: "reactivate", staff: row })}
+                                    >
+                                      Reactivate
+                                    </button>
+                                  )}
+                              </div>
+                            )}
+                        </td>
                       </tr>
                     ))}
                 </tbody>
@@ -140,6 +214,18 @@ export function StaffAccounts() {
           )
           : null}
       </div>
+
+      {openAction
+        ? (
+          <StaffActionDialog
+            action={openAction.action}
+            staff={openAction.staff}
+            roles={roles}
+            onClose={() => setOpenAction(null)}
+            onDone={handleDone}
+          />
+        )
+        : null}
     </AppShell>
   );
 }

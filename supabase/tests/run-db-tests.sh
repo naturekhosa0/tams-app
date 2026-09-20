@@ -24,4 +24,10 @@ done
 
 echo "Running the tests…"
 run_sql "$DB_NAME" "$ROOT/supabase/tests/01_test_helpers.sql"
-su "$PSQL_USER" -c "psql -v ON_ERROR_STOP=1 -X -d '$DB_NAME' -f '$ROOT/supabase/tests/02_foundation_tests.sql'"
+for suite in "$ROOT"/supabase/tests/0[2-9]_*.sql; do
+  echo "  $(basename "$suite")"
+  run_sql "$DB_NAME" "$suite"
+done
+
+# Prints every result and fails the run if anything failed.
+su "$PSQL_USER" -c "psql -v ON_ERROR_STOP=1 -X -d '$DB_NAME' -f '$ROOT/supabase/tests/99_report.sql'"
