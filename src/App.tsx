@@ -1,6 +1,9 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./auth/SessionProvider";
-import { RequireAdministrator, RequireRegistryClerk, RequireResident, RequireStaff } from "./components/guards";
+import {
+  RequireAdministrator, RequireLandOfficer, RequireRegistryClerk, RequireResident, RequireStaff,
+  RequireStaffOrResident,
+} from "./components/guards";
 import { isConfigured } from "./lib/supabaseClient";
 import { Landing } from "./pages/Landing";
 import { SignIn } from "./pages/SignIn";
@@ -21,6 +24,17 @@ import { ResidentRequests } from "./pages/registry/ResidentRequests";
 import { ResidentRequestReview } from "./pages/registry/ResidentRequestReview";
 import { Register } from "./pages/resident/Register";
 import { ResidentPortalPage } from "./pages/resident/ResidentPortal";
+import { LandDashboard } from "./pages/land/LandDashboard";
+import { LandApplications } from "./pages/land/LandApplications";
+import { LandApplicationReview } from "./pages/land/LandApplicationReview";
+import { LandSites } from "./pages/land/LandSites";
+import { LandSiteHistory } from "./pages/land/LandSiteHistory";
+import { LandAllocations } from "./pages/land/LandAllocations";
+import { LandPtos } from "./pages/land/LandPtos";
+import { LandRenewals } from "./pages/land/LandRenewals";
+import { LandSuccession } from "./pages/land/LandSuccession";
+import { PtoDocumentPage } from "./pages/land/PtoDocumentPage";
+import { VerifyPto } from "./pages/land/VerifyPto";
 import { Notice } from "./components/ui";
 
 function NotConfigured() {
@@ -53,6 +67,9 @@ export default function App() {
           <Route path="/no-access" element={<NoAccess />} />
           <Route path="/register" element={<Register />} />
 
+          {/* Anybody holding a printed permission may check it. */}
+          <Route path="/verify/pto/:token" element={<VerifyPto />} />
+
           {/* Any signed-in resident, whatever their verification */}
           <Route path="/resident" element={<RequireResident><ResidentPortalPage /></RequireResident>} />
 
@@ -76,6 +93,22 @@ export default function App() {
           <Route path="/registry/lineage/:residentId" element={<RequireRegistryClerk><FamilyLineage /></RequireRegistryClerk>} />
           <Route path="/registry/resident-accounts" element={<RequireRegistryClerk><ResidentRequests /></RequireRegistryClerk>} />
           <Route path="/registry/resident-accounts/:requestId" element={<RequireRegistryClerk><ResidentRequestReview /></RequireRegistryClerk>} />
+
+          {/* The active Land Officer only */}
+          <Route path="/land" element={<RequireLandOfficer><LandDashboard /></RequireLandOfficer>} />
+          <Route path="/land/applications" element={<RequireLandOfficer><LandApplications /></RequireLandOfficer>} />
+          <Route path="/land/applications/:applicationId" element={<RequireLandOfficer><LandApplicationReview /></RequireLandOfficer>} />
+          <Route path="/land/sites" element={<RequireLandOfficer><LandSites /></RequireLandOfficer>} />
+          <Route path="/land/sites/:siteId" element={<RequireLandOfficer><LandSiteHistory /></RequireLandOfficer>} />
+          <Route path="/land/allocations" element={<RequireLandOfficer><LandAllocations /></RequireLandOfficer>} />
+          <Route path="/land/ptos" element={<RequireLandOfficer><LandPtos /></RequireLandOfficer>} />
+          <Route path="/land/renewals" element={<RequireLandOfficer><LandRenewals /></RequireLandOfficer>} />
+          <Route path="/land/succession" element={<RequireLandOfficer><LandSuccession /></RequireLandOfficer>} />
+
+          {/* The permission document itself. Who may open which one is
+              decided in the database, not here: a resident sees their
+              own, the Land Officer sees any. */}
+          <Route path="/pto/:ptoId" element={<RequireStaffOrResident><PtoDocumentPage /></RequireStaffOrResident>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

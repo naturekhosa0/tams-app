@@ -342,6 +342,10 @@ select tams_test.check(
 -- rows were never touched.
 create table tams_test.imported_relationships as
   select id from public.family_relationships;
+create table tams_test.imported_allocations as
+  select id, allocation_reference, land_site_id, resident_id, allocation_date from public.land_allocations;
+create table tams_test.imported_sites as
+  select id, site_code, site_type, street_address from public.land_sites;
 
 select tams_test.check(
   'IMPORT 17 — the import refuses to run a second time',

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../../auth/SessionProvider";
 import { Loading, Notice } from "../../components/ui";
 import { VerificationForm } from "./VerificationForm";
+import { ResidentLand } from "../land/ResidentLand";
 import { formatDate, formatDateTime, initialsOf } from "../../lib/format";
 import { ensureResidentAccount, residentPortal } from "../../registry/residentApi";
 import type { ResidentPortal as Portal } from "../../registry/residentApi";
@@ -215,9 +216,13 @@ export function ResidentPortalPage() {
             ? (
               <div className="bullet-list">
                 <p>Your account is verified and linked to your record on the village register.</p>
+                <p>
+                  You can apply for land below. TAMS allocates residential, farming, business and
+                  burial land; you apply for a kind of land and the Land Officer chooses the site.
+                </p>
                 <p style={{ color: "var(--muted)" }}>
-                  Resident services — your land, your permission to occupy, and the rest — are
-                  being built and will appear here when they are ready.
+                  You never need to send your identity document or proof of address again — they
+                  are already on your verified account.
                 </p>
               </div>
             )
@@ -249,6 +254,10 @@ export function ResidentPortalPage() {
           </p>
         </div>
       </div>
+
+      {status === "active"
+        ? <div style={{ marginTop: 22 }}><ResidentLand /></div>
+        : null}
 
       {profile?.account_type === "staff"
         ? <div style={{ marginTop: 18 }}><Notice kind="info">You are signed in as staff.</Notice></div>

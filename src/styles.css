@@ -416,3 +416,105 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
   background: var(--surface-soft);
   cursor: pointer;
 }
+
+/* ---------- land ---------------------------------------------------- */
+
+.land-option {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  background: var(--surface-soft);
+}
+.land-option .name { font-weight: 600; font-size: 15px; }
+.land-option .status-note { margin-top: 2px; }
+
+.land-problems {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.55;
+}
+.land-problems li + li { margin-top: 3px; }
+
+/* ---------- the permission document --------------------------------- */
+
+.certificate {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 38px 40px 30px;
+  max-width: 860px;
+  margin: 0 auto;
+}
+.certificate-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 18px;
+  align-items: center;
+  padding-bottom: 22px;
+  border-bottom: 2px solid var(--accent);
+}
+.certificate-head h1 { font-size: 27px; margin: 2px 0; }
+.certificate-authority {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.certificate-village { font-size: 14px; color: var(--ink-soft); }
+.certificate-number { text-align: right; }
+.certificate-number-value { font-size: 17px; font-weight: 700; letter-spacing: -0.01em; }
+
+.certificate-body {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 34px;
+  padding: 26px 0;
+}
+.certificate-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 26px;
+  align-content: start;
+}
+.certificate-field { min-width: 0; }
+.certificate-value { font-size: 15px; font-weight: 600; margin-top: 2px; }
+.certificate-qr { text-align: center; width: 190px; }
+.certificate-token {
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 11px;
+  color: var(--muted);
+  word-break: break-all;
+}
+.certificate-foot {
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 760px) {
+  .certificate { padding: 26px 22px; }
+  .certificate-head { grid-template-columns: auto 1fr; }
+  .certificate-number { grid-column: 1 / -1; text-align: left; }
+  .certificate-body { grid-template-columns: 1fr; }
+  .certificate-fields { grid-template-columns: 1fr; }
+  .certificate-qr { width: auto; }
+}
+
+@media print {
+  body { background: #fff; }
+  .no-print { display: none !important; }
+  .page { padding: 0; max-width: none; }
+  .certificate {
+    border: 0;
+    box-shadow: none;
+    border-radius: 0;
+    max-width: none;
+    padding: 0;
+  }
+}

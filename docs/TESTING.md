@@ -36,7 +36,7 @@ run without Deno or a Supabase project. `tests/` covers:
   lineage is never offered an ending and a remarriage shows both the
   current marriage and the former one.
 
-## `npm run test:db` — the database rules (322 tests)
+## `npm run test:db` — the database rules (432 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -51,7 +51,7 @@ pg_ctlcluster 16 main start     # Debian/Ubuntu
 npm run test:db
 ```
 
-Two suites, both of which read as a list of the rules themselves:
+Each suite reads as a list of the rules themselves:
 
 * `02_foundation_tests.sql` — the first administrator bootstrap, staff
   creation and everything it refuses, Row Level Security for
@@ -74,6 +74,21 @@ Two suites, both of which read as a list of the rules themselves:
 * `07_resident_accounts_tests.sql` — registration, documents, one
   pending request at a time, the Registry Clerk's review, approval,
   decline, and reapplying with the same account and the same sign-in.
+* `08_land_tests.sql` — land. Grazing refused as a kind of land, the
+  four that are allowed, who counts as a Land Officer, the 21 rule at
+  exactly 21 and one day short, applying without ever choosing a site,
+  approval and decline with a reason, allocation in one transaction, the
+  same site refused twice, one residential stand per person, one
+  business site per person, one farming site per household, a burial
+  plot only when every plot the household holds is full, a full plot
+  staying with its household for ever, perpetual permissions with a null
+  expiry rather than a pretend date, farming at five years and business
+  at two to the day, expiry read from the date rather than a scheduler,
+  renewal writing a new permission and keeping the old one, revocation
+  with a reason, release freeing the site, succession waiting rather
+  than freeing a stand, TAMS naming no heir, returning land to the
+  Authority, QR verification showing no identity number or birth date,
+  and a resident being refused every officer function there is.
 * `04_legacy_import_tests.sql` — the legacy import. Every validation is
   given a dataset that breaks exactly one rule, and each one must write
   nothing at all; then the real CSV package is imported through the same

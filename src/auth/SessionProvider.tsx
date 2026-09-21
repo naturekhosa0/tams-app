@@ -135,5 +135,6 @@ export function homePathFor(profile: StaffContext | null): string {
   if (!profile || !profile.access_granted) return "/no-access";
   if (profile.is_council_administrator) return "/dashboard";
   if (profile.role_name === "Registry Clerk") return "/registry";
+  if (profile.role_name === "Land Officer") return "/land";
   return "/home";
 }
