@@ -113,3 +113,15 @@ member — the Council Administrator included — can read or write them.
 Access arrives with the Registry Clerk and Land Officer functions, which
 will bring their own rules. Only trusted server-side code reaches these
 tables today.
+
+## Changing the village name later
+
+The import has already run, so the name lives in `land_sites.village_name`
+in the database. Editing `data/legacy-import/land_sites.csv` changes what
+a *fresh* import would load, not what is already there.
+
+To change it on data that is already imported, run
+[`scripts/rename-village.sql`](../scripts/rename-village.sql) in the
+Supabase SQL Editor. It shows the name before and after, touches
+`village_name` and nothing else, and confirms the record counts are
+unchanged.

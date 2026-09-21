@@ -338,6 +338,11 @@ select tams_test.check(
   tams_test.try_import(tams_test.real_payload()) = 'OK'
 );
 
+-- Exactly what the import produced, so later suites can prove these
+-- rows were never touched.
+create table tams_test.imported_relationships as
+  select id from public.family_relationships;
+
 select tams_test.check(
   'IMPORT 17 — the import refuses to run a second time',
   tams_test.try_import(tams_test.real_payload()) = 'TA022'

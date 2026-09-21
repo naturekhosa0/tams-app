@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { Field, Loading, Notice } from "../../components/ui";
 import {
-  designateHouseholdHead, linkResidentToHousehold, NEEDS_CONFIRMATION,
-  recordFamilyRelationship, searchHouseholds, searchResidents,
+  designateHouseholdHead, endFamilyRelationship, linkResidentToHousehold,
+  NEEDS_CONFIRMATION, recordFamilyRelationship, searchHouseholds, searchResidents,
 } from "../../registry/api";
+import { isTimeBased } from "../../registry/lineage";
 import { RELATIONSHIP_TYPES } from "../../registry/types";
 import type {
-  HouseholdMember, HouseholdSearchRow, RelationshipType, ResidentSearchRow,
+  HouseholdMember, HouseholdSearchRow, LineageRow, RelationshipType, ResidentSearchRow,
 } from "../../registry/types";
 
 /** The frame every registry dialog uses. */
@@ -294,6 +295,7 @@ export function RecordRelationshipDialog({
   onDone: (message: string) => void | Promise<void>;
 }) {
   const [relationshipType, setRelationshipType] = useState<RelationshipType>("parent");
+  const [startedAt, setStartedAt] = useState("");
   const [search, setSearch] = useState("");
   const [residents, setResidents] = useState<ResidentSearchRow[] | null>(null);
   const [chosen, setChosen] = useState<ResidentSearchRow | null>(null);
@@ -313,7 +315,8 @@ export function RecordRelationshipDialog({
     setSubmitting(true);
     setError(null);
 
-    const result = await recordFamilyRelationship(resident.resident_id, chosen.resident_id, relationshipType);
+    const result = await recordFamilyRelationship(
+      resident.resident_id, chosen.resident_id, relationshipType, startedAt || null);
     setSubmitting(false);
 
     if (!result.ok) { setError(result.message); return; }
@@ -342,6 +345,20 @@ export function RecordRelationshipDialog({
           </select>
         </Field>
       </div>
+
+      {/* A marriage or a guardianship is an episode, so it has to say
+          when it began. Lineage simply is, and needs no date. */}
+      {isTimeBased(relationshipType)
+        ? (
+          <div style={{ marginTop: 16 }}>
+            <Field label="When did it begin?" htmlFor="started-at"
+                   hint="Needed so this can later be ended, and begun again, without losing the history.">
+              <input id="started-at" type="date" value={startedAt}
+                     onChange={(event) => setStartedAt(event.target.value)} />
+            </Field>
+          </div>
+        )
+        : null}
 
       <div style={{ marginTop: 16 }}>
         <Field label="…of which resident?" htmlFor="relative-search">
@@ -377,8 +394,79 @@ export function RecordRelationshipDialog({
 
       <div className="dialog-actions">
         <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
-        <button type="button" className="btn btn-primary" disabled={!chosen || submitting} onClick={() => void submit()}>
+        <button type="button" className="btn btn-primary"
+                disabled={!chosen || submitting || (isTimeBased(relationshipType) && !startedAt)}
+                onClick={() => void submit()}>
           {submitting ? "Saving…" : "Record relationship"}
+        </button>
+      </div>
+    </Dialog>
+  );
+}
+
+/**
+ * Ending a marriage or a guardianship.
+ *
+ * The rows stay exactly where they are: this records that the episode
+ * ended, on both sides, and nothing is erased. If the same two people
+ * start again later, that is a new episode recorded separately.
+ */
+export function EndRelationshipDialog({
+  residentName,
+  row,
+  onClose,
+  onDone,
+}: {
+  residentName: string;
+  row: LineageRow;
+  onClose: () => void;
+  onDone: (message: string) => void | Promise<void>;
+}) {
+  const [endedAt, setEndedAt] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  async function submit() {
+    setSubmitting(true);
+    setError(null);
+    const result = await endFamilyRelationship(row.relationship_id, endedAt);
+    setSubmitting(false);
+    if (!result.ok) { setError(result.message); return; }
+    await onDone(
+      `${residentName} and ${row.related_full_name} are no longer recorded as ${row.relationship_type}. ` +
+        "The relationship is kept on record.",
+    );
+  }
+
+  return (
+    <Dialog
+      title={`End this ${row.relationship_type}`}
+      intro={`This records that the ${row.relationship_type} relationship between ${residentName} and ${row.related_full_name} has ended. Both sides are ended together and neither row is deleted. If it begins again later, that is recorded as a new one.`}
+      onClose={onClose}
+    >
+      {error ? <Notice kind="error">{error}</Notice> : null}
+
+      <div className="dialog-details">
+        <div className="detail-item">
+          <span className="label">Between</span>
+          <span className="value">{residentName} and {row.related_full_name}</span>
+        </div>
+        <div className="detail-item">
+          <span className="label">Began</span>
+          <span className="value">{row.relationship_started_at ?? "Not recorded"}</span>
+        </div>
+      </div>
+
+      <Field label="When did it end?" htmlFor="ended-at">
+        <input id="ended-at" type="date" value={endedAt}
+               onChange={(event) => setEndedAt(event.target.value)} />
+      </Field>
+
+      <div className="dialog-actions">
+        <button type="button" className="btn btn-ghost" onClick={onClose}>Cancel</button>
+        <button type="button" className="btn btn-danger" disabled={!endedAt || submitting}
+                onClick={() => void submit()}>
+          {submitting ? "Saving…" : "End relationship"}
         </button>
       </div>
     </Dialog>

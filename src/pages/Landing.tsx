@@ -26,9 +26,14 @@ export function Landing() {
           workspace — the record pages will be built on this same look.
         </p>
 
-        <button type="button" className="btn btn-primary" onClick={() => navigate("/auth")}>
-          Sign in
-        </button>
+        <div className="row">
+          <button type="button" className="btn btn-primary" onClick={() => navigate("/auth")}>
+            Sign in
+          </button>
+          <button type="button" className="btn btn-ghost" onClick={() => navigate("/register")}>
+            Create a resident account
+          </button>
+        </div>
       </div>
     </div>
   );

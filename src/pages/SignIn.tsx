@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { homePathFor, useSession } from "../auth/SessionProvider";
 import { supabase } from "../lib/supabaseClient";
 import { Field, Loading, Notice } from "../components/ui";
@@ -109,7 +109,8 @@ export function SignIn() {
         </form>
 
         <p style={{ marginTop: 18, fontSize: 14, color: "var(--muted)" }}>
-          Staff accounts are created by the Council Administrator. There is no public sign-up.
+          Staff accounts are created by the Council Administrator. Residents can{" "}
+          <Link to="/register">create an account</Link> and send their details to be verified.
         </p>
       </div>
     </div>

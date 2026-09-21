@@ -146,3 +146,31 @@ Relationships are never deleted. One that is no longer current is set to
 | `/registry/households` | Search households, create one |
 | `/registry/households/:id` | Household, site, allocation context, members |
 | `/registry/lineage/:id` | Full family lineage, and recording relationships |
+
+## "Could not find the function public.registry_… in the schema cache"
+
+That message comes from PostgREST, not from TAMS, and it means one of
+two things.
+
+**The migration has not been applied to your project.** Run:
+
+```bash
+npm run db:push
+```
+
+or paste `supabase/migrations/20260922090000_registry_clerk.sql` into
+the Supabase SQL Editor. It is safe to run more than once.
+
+**Or the migration is applied and PostgREST has not noticed yet.** It
+keeps its own cache of what the database offers. Run this in the SQL
+Editor:
+
+```sql
+notify pgrst, 'reload schema';
+```
+
+To find out which of the two it is, run
+[`scripts/check-registry-functions.sql`](../scripts/check-registry-functions.sql)
+in the SQL Editor. It counts the functions (there should be 15), lists
+them with whether a signed-in user may call them, and reloads the cache
+for you.

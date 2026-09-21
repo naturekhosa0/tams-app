@@ -8,8 +8,9 @@
 
 import { supabase } from "../lib/supabaseClient";
 import type {
-  AvailableSite, HouseholdRecord, HouseholdSearchRow, LineageRow,
-  RegistryStats, RelationshipType, ResidentRecord, ResidentSearchRow, ResidentStatus,
+  AvailableSite, CandidateRow, HouseholdRecord, HouseholdSearchRow, LineageRow,
+  PendingRequestRow, RegistryStats, RelationshipType, ResidentRecord,
+  ResidentRequestDetail, ResidentSearchRow, ResidentStatus,
 } from "./types";
 
 export type RegistryResult<T> =
@@ -38,6 +39,20 @@ function failure(error: { code?: string; message: string }): RegistryResult<neve
       ok: false,
       code: "42501",
       message: "Only an active Registry Clerk may do that. Ask the Council Administrator if this looks wrong.",
+    };
+  }
+
+  // PostgREST could not find the function it was asked for. The raw
+  // wording ("… in the schema cache") says nothing useful to whoever is
+  // looking at the screen, so say what it actually means.
+  if (error.code === "PGRST202") {
+    return {
+      ok: false,
+      code: "PGRST202",
+      message:
+        "This part of the system is not installed on the database yet. " +
+        "The Registry Clerk migration needs to be applied to the Supabase project " +
+        "(see docs/REGISTRY-CLERK.md). Nothing you did caused this.",
     };
   }
   return { ok: false, code: error.code ?? "unknown", message };
@@ -145,15 +160,43 @@ export const recordFamilyRelationship = (
   residentId: string,
   relatedResidentId: string,
   relationshipType: RelationshipType,
+  /** Required for a marriage or a guardianship; lineage has no start. */
+  startedAt: string | null = null,
 ) =>
-  call<{ relationship_type: string; inverse_type: string }>("registry_record_family_relationship", {
-    p_resident_id: residentId,
-    p_related_resident_id: relatedResidentId,
-    p_relationship_type: relationshipType,
+  call<{ relationship_type: string; inverse_type: string; started_at: string | null }>(
+    "registry_record_family_relationship", {
+      p_resident_id: residentId,
+      p_related_resident_id: relatedResidentId,
+      p_relationship_type: relationshipType,
+      p_started_at: startedAt || null,
+    });
+
+/** Ends this episode and the matching one the other way round. */
+export const endFamilyRelationship = (relationshipId: string, endedAt: string) =>
+  call<{ relationship_type: string; ended_at: string }>("registry_end_family_relationship", {
+    p_relationship_id: relationshipId,
+    p_ended_at: endedAt,
   });
 
-export const setRelationshipStatus = (relationshipId: string, status: "active" | "inactive") =>
-  call<{ relationship_status: string }>("registry_set_relationship_status", {
-    p_relationship_id: relationshipId,
-    p_status: status,
+// ---- resident account verification ----------------------------------
+
+export const pendingResidentRequests = () =>
+  call<PendingRequestRow[]>("registry_pending_resident_requests");
+
+export const residentRequest = (requestId: string) =>
+  call<ResidentRequestDetail>("registry_resident_request", { p_request_id: requestId });
+
+export const residentCandidates = (requestId: string) =>
+  call<CandidateRow[]>("registry_resident_candidates", { p_request_id: requestId });
+
+export const approveResidentRequest = (requestId: string, residentId: string) =>
+  call<{ resident_name: string; household_code: string }>("registry_approve_resident_request", {
+    p_request_id: requestId,
+    p_resident_id: residentId,
+  });
+
+export const declineResidentRequest = (requestId: string, reason: string) =>
+  call<{ decline_reason: string }>("registry_decline_resident_request", {
+    p_request_id: requestId,
+    p_reason: reason,
   });

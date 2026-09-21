@@ -327,9 +327,9 @@ select tams_test.run_as('service_role', null, $sql$
   insert into public.land_sites (site_code, site_type, stand_number, street_address,
                                  village_section, village_name, site_status)
   values ('RES-0021', 'residential', 'ST-1021', '73 Baobab Close', 'Central',
-          'Mahlasedi Village (Synthetic)', 'allocated'),
+          'Mhinga Village', 'allocated'),
          ('GRAZE-001', 'grazing', null, 'Common grazing land', 'North',
-          'Mahlasedi Village (Synthetic)', 'allocated')
+          'Mhinga Village', 'allocated')
 $sql$);
 
 select tams_test.check(
@@ -567,7 +567,7 @@ select tams_test.check(
   'FAMILY 29 — a spouse relationship creates a spouse relationship back',
   tams_test.run_as('authenticated', tams_test.clerk(), $sql$
     select public.registry_record_family_relationship(
-      tams_test.resident_id_of('SYN0000000901'), tams_test.resident_id_of('SYN0000000014'), 'spouse')
+      tams_test.resident_id_of('SYN0000000901'), tams_test.resident_id_of('SYN0000000014'), 'spouse', '2015-06-20')
   $sql$) = 'OK'
 );
 
@@ -600,7 +600,7 @@ select tams_test.check(
   'FAMILY 30b — a guardian relationship is recorded',
   tams_test.run_as('authenticated', tams_test.clerk(), $sql$
     select public.registry_record_family_relationship(
-      tams_test.resident_id_of('SYN0000000901'), tams_test.resident_id_of('SYN0000000016'), 'guardian')
+      tams_test.resident_id_of('SYN0000000901'), tams_test.resident_id_of('SYN0000000016'), 'guardian', '2019-02-01')
   $sql$) = 'OK'
 );
 
@@ -650,7 +650,7 @@ select tams_test.check(
   'FAMILY 32a — a relationship is recorded whose inverse will already exist',
   tams_test.run_as('authenticated', tams_test.clerk(), $sql$
     select public.registry_record_family_relationship(
-      tams_test.resident_id_of('SYN0000000003'), tams_test.resident_id_of('SYN0000000001'), 'guardian')
+      tams_test.resident_id_of('SYN0000000003'), tams_test.resident_id_of('SYN0000000001'), 'guardian', '2020-01-01')
   $sql$) = 'OK'
 );
 
@@ -672,13 +672,14 @@ select tams_test.check(
 );
 
 select tams_test.check(
-  'FAMILY 34 — a relationship is retired by status, never deleted',
+  'FAMILY 34 — a marriage is ended, never deleted',
   tams_test.run_as('authenticated', tams_test.clerk(), $sql$
-    select public.registry_set_relationship_status(
+    select public.registry_end_family_relationship(
       (select id from public.family_relationships
         where resident_id = tams_test.resident_id_of('SYN0000000901')
           and related_resident_id = tams_test.resident_id_of('SYN0000000014')
-          and relationship_type = 'spouse'), 'inactive')
+          and relationship_type = 'spouse'
+          and relationship_status = 'active'), '2022-04-30')
   $sql$) = 'OK'
 );
 
