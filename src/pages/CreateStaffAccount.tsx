@@ -4,6 +4,7 @@ import { supabase, callEdgeFunction } from "../lib/supabaseClient";
 import { AppShell } from "../components/AppShell";
 import { Field, Notice } from "../components/ui";
 import type { AssignableRole } from "../lib/types";
+import { PageHead } from "../components/PageHead";
 
 type CreatedStaff = {
   staff: { employee_number: string; email: string; role_name: string };
@@ -80,10 +81,16 @@ export function CreateStaffAccount() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Create staff account</h1>
-        <p>The staff member receives an email invitation and chooses their own password.</p>
-      </div>
+      <PageHead
+        title="Create staff account"
+        description="The staff member receives an email invitation and chooses their own password."
+        crumbs={[
+          { label: "Dashboard", to: "/dashboard" },
+          { label: "Staff accounts", to: "/staff" },
+          { label: "Create staff account" },
+        ]}
+        back={{ to: "/staff", label: "Back to staff accounts" }}
+      />
 
       {success
         ? (

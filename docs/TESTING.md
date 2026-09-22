@@ -4,7 +4,7 @@
 npm run test:all        # typecheck + edge function rules + database rules
 ```
 
-## `npm test` — the edge function, import and lineage rules (91 tests)
+## `npm test` — the edge function, worker, navigation and import rules (125 tests)
 
 Each edge function keeps its decisions in a `handler.ts` that takes
 everything it needs through a small set of ports, so the rules can be
@@ -34,9 +34,23 @@ run without Deno or a Supabase project. `tests/` covers:
   "Grandparents";
 * which relationships are permanent and which are episodes, so that
   lineage is never offered an ending and a remarriage shows both the
-  current marriage and the former one.
+  current marriage and the former one;
+* the notification email worker — a queued notification is sent once and
+  once only, a second run sends nothing again, a provider failure is
+  recorded and the batch carries on, a provider that throws does not stop
+  it, the shared secret is required, an unconfigured provider refuses to
+  send, provider errors are shortened and flattened before storage, and
+  anything in a title or message is escaped before it becomes HTML;
+* emergency administrator recovery — it refuses while a healthy
+  administrator exists, refuses without the secret, is off entirely until
+  the secret is configured, lists eligible staff without changing
+  anything, requires both a person and a reason, and never echoes the
+  secret back;
+* navigation — where each role's home is, what each role is offered,
+  that no role is offered another role's area, and that every navigation
+  link and every role's home is a route the application actually serves.
 
-## `npm run test:db` — the database rules (552 tests)
+## `npm run test:db` — the database rules (694 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -110,6 +124,31 @@ Each suite reads as a list of the rules themselves:
   overdue being worked out from the date and refusing to be stored or
   chosen; and a resident's direct queries against the tables returning
   exactly the same narrow answer the function gives them.
+* `10_notifications_audit_admin_tests.sql` — notifications and their
+  emails, official communications, staff messaging and work requests,
+  the audit trail, Administrator Transfer and emergency recovery. A
+  recipient sees their own notifications and nobody else's; the unread
+  count, marking read and archiving all work and none of them can change
+  what a notification says; every notification queues exactly one email;
+  the worker claims a batch once and never re-claims it; a failed email
+  leaves the permission, the allocation and the notification exactly
+  where they were. Expiry warnings fire at sixty, thirty and seven days
+  for farming and business only, once each, never for the perpetual
+  kinds. A summons reaches the one resident it names and nobody else; a
+  selection reaches exactly the selection; a broadcast snapshots who was
+  active at that moment, so somebody verified afterwards is not a
+  recipient. Staff messaging refuses residents and deactivated staff,
+  snapshots role recipients, keeps sent messages unaltered, and proves a
+  linked record grants no permission. A role work request is claimed by
+  the first to acknowledge it and resolved only by them. The audit
+  records old and new values with the real actor, cannot be updated or
+  deleted by anybody including the service key and the database owner,
+  holds no password, token, key, document path or private message body,
+  and is readable by the Council Administrator alone. The administrator
+  role is transferred three times over with each ordinary outcome and
+  once with deactivation, always leaving exactly one active
+  administrator, and emergency recovery refuses until there is none and
+  refuses again once there is one.
 * `04_legacy_import_tests.sql` — the legacy import. Every validation is
   given a dataset that breaks exactly one rule, and each one must write
   nothing at all; then the real CSV package is imported through the same

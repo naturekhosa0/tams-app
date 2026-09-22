@@ -54,6 +54,16 @@ export function RequireLandOfficer({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+/** Requires any signed-in account at all — staff or resident. */
+export function RequireAccount({ children }: { children: ReactNode }) {
+  const { loading, session } = useSession();
+  const location = useLocation();
+
+  if (loading) return <Loading what="Checking your account" />;
+  if (!session) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
+  return <>{children}</>;
+}
+
 /** Requires an active Council Secretary. */
 export function RequireCouncilSecretary({ children }: { children: ReactNode }) {
   const { loading, session, profile } = useSession();

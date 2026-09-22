@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import { Field, Loading, Notice } from "../../components/ui";
 import { formatDate } from "../../lib/format";
 import { officerApplications } from "../../registry/landApi";
 import { LAND_TYPES, LAND_TYPE_LABELS } from "../../registry/landTypes";
 import type { OfficerApplicationRow } from "../../registry/landTypes";
+import { PageHead } from "../../components/PageHead";
 
 const STATUSES = [
   { value: "pending", label: "Waiting for review" },
@@ -47,13 +48,12 @@ export function LandApplications() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Land applications</h1>
-        <p>
-          Residents apply for a kind of land, never for a particular site. You decide the
-          application first, and only then choose the site.
-        </p>
-      </div>
+      <PageHead
+        title="Land applications"
+        description="Residents apply for a kind of land, never for a particular site. You decide the application first, and only then choose the site."
+        crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Applications" }]}
+        actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
+      />
 
       <div className="card">
         <form

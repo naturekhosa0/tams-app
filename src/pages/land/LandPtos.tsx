@@ -6,6 +6,7 @@ import { formatDate } from "../../lib/format";
 import { officerPtos, revokePto } from "../../registry/landApi";
 import { LAND_TYPE_LABELS } from "../../registry/landTypes";
 import type { OfficerPtoRow } from "../../registry/landTypes";
+import { PageHead } from "../../components/PageHead";
 
 const STATUSES = [
   { value: "", label: "All" },
@@ -38,14 +39,12 @@ export function LandPtos() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Permissions to occupy</h1>
-        <p>
-          Residential and burial permissions are perpetual and carry no expiry date at all.
-          Farming runs for five years and business for two — a lapsed permission is one whose
-          expiry date has passed, worked out from the date, not from a nightly job.
-        </p>
-      </div>
+      <PageHead
+        title="Permissions to occupy"
+        description="Residential and burial permissions are perpetual and carry no expiry date at all. Farming runs for five years and business for two — a lapsed permission is one whose expiry date has passed, worked out from the date, not from a nightly job."
+        crumbs={[{ label: "Dashboard", to: "/land" }, { label: "PTOs" }]}
+        actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

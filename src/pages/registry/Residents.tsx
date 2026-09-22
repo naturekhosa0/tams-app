@@ -6,6 +6,7 @@ import { ResidentStatusBadge } from "./bits";
 import { formatDate } from "../../lib/format";
 import { searchResidents } from "../../registry/api";
 import type { ResidentSearchRow } from "../../registry/types";
+import { PageHead } from "../../components/PageHead";
 
 /** Search and view the village register. */
 export function Residents() {
@@ -38,13 +39,17 @@ export function Residents() {
 
   return (
     <AppShell>
-      <div className="page-head row-between">
-        <div>
-          <h1>Residents</h1>
-          <p>Everyone on the village register, with their household and where they live.</p>
-        </div>
-        <Link to="/registry/residents/new" className="btn btn-primary">Create resident</Link>
-      </div>
+      <PageHead
+        title="Residents"
+        description="Everyone on the village register, with their household and where they live."
+        crumbs={[{ label: "Dashboard", to: "/registry" }, { label: "Residents" }]}
+        actions={
+          <>
+            <Link to="/registry" className="btn btn-ghost">Back to dashboard</Link>
+            <Link to="/registry/residents/new" className="btn btn-primary">Create resident</Link>
+          </>
+        }
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
 

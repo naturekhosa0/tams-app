@@ -5,6 +5,7 @@ import { Field, Loading, Notice } from "../../components/ui";
 import { officerSites, registerSite, setBurialStatus, updateSite } from "../../registry/landApi";
 import { LAND_TYPES, LAND_TYPE_LABELS } from "../../registry/landTypes";
 import type { LandType, OfficerSiteRow } from "../../registry/landTypes";
+import { PageHead } from "../../components/PageHead";
 
 const SITE_STATUSES = [
   { value: "available", label: "Available" },
@@ -44,18 +45,19 @@ export function LandSites() {
 
   return (
     <AppShell>
-      <div className="page-head row-between">
-        <div>
-          <h1>Land sites</h1>
-          <p>
-            Every site TAMS knows about. A site has one kind of land, and only an available site
-            can be allocated.
-          </p>
-        </div>
-        <button type="button" className="btn btn-primary" onClick={() => setRegistering(true)}>
-          Register a site
-        </button>
-      </div>
+      <PageHead
+        title="Land sites"
+        description="Every site TAMS knows about. A site has one kind of land, and only an available site can be allocated."
+        crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Land sites" }]}
+        actions={
+          <>
+            <Link to="/land" className="btn btn-ghost">Back to dashboard</Link>
+            <button type="button" className="btn btn-primary" onClick={() => setRegistering(true)}>
+              Register a site
+            </button>
+          </>
+        }
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

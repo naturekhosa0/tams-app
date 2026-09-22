@@ -1,74 +1,87 @@
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { useSession } from "../auth/SessionProvider";
 import { initialsOf } from "../lib/format";
+import { unreadCount } from "../registry/adminApi";
+import { homeFor, navigationFor } from "./navigation";
 
-/** The workspace frame: brand, the navigation for this user's role, sign out. */
+/** How often the bell re-counts while a window is left open. */
+const UNREAD_REFRESH_MS = 60_000;
+
+/**
+ * The workspace frame: the TAMS name (which is always the way home),
+ * the navigation for this user's role, their unread notifications, and
+ * sign out. Nothing in here is ever the only way to leave a page — but
+ * it is always there.
+ */
 export function AppShell({ children }: { children: ReactNode }) {
-  const { profile, signOut } = useSession();
-  const isAdministrator = profile?.is_council_administrator ?? false;
-  const isRegistryClerk = profile?.role_name === "Registry Clerk";
-  const isLandOfficer = profile?.role_name === "Land Officer";
-  const isCouncilSecretary = profile?.role_name === "Council Secretary";
+  const { profile, session, signOut } = useSession();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [unread, setUnread] = useState(0);
+
+  const items = navigationFor(profile);
+  const home = homeFor(profile, Boolean(session));
+
+  // The bell is a courtesy, so a failure to count is simply no badge.
+  useEffect(() => {
+    let cancelled = false;
+    const count = async () => {
+      const result = await unreadCount();
+      if (!cancelled && result.ok) setUnread(Number(result.data ?? 0));
+    };
+    void count();
+    const timer = window.setInterval(count, UNREAD_REFRESH_MS);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [location.pathname]);
+
+  // Choosing something closes the menu again.
+  useEffect(() => { setMenuOpen(false); }, [location.pathname]);
+
+  const notificationsPath = profile?.account_type === "resident"
+    ? "/resident/notifications"
+    : "/notifications";
 
   return (
     <div className="page">
       <header className="topbar">
-        <div className="brand">
+        <Link to={home} className="brand brand-link" aria-label="TAMS home">
           <div className="brand-mark" aria-hidden="true">T</div>
           <div>
             <div className="brand-name">TAMS</div>
             <div className="brand-sub">Traditional Authority</div>
           </div>
-        </div>
+        </Link>
 
-        <nav className="topnav">
-          {isAdministrator
-            ? (
-              <>
-                <NavLink to="/dashboard" className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
-                <NavLink to="/staff" end className={({ isActive }) => isActive ? "active" : ""}>Staff accounts</NavLink>
-                <NavLink to="/staff/new" className={({ isActive }) => isActive ? "active" : ""}>Create staff account</NavLink>
-              </>
-            )
-            : isRegistryClerk
-            ? (
-              <>
-                <NavLink to="/registry" end className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
-                <NavLink to="/registry/residents" className={({ isActive }) => isActive ? "active" : ""}>Residents</NavLink>
-                <NavLink to="/registry/households" className={({ isActive }) => isActive ? "active" : ""}>Households</NavLink>
-                <NavLink to="/registry/lineage" className={({ isActive }) => isActive ? "active" : ""}>Family lineage</NavLink>
-                <NavLink to="/registry/resident-accounts" className={({ isActive }) => isActive ? "active" : ""}>Resident accounts</NavLink>
-                <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
-              </>
-            )
-            : isLandOfficer
-            ? (
-              <>
-                <NavLink to="/land" end className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
-                <NavLink to="/land/applications" className={({ isActive }) => isActive ? "active" : ""}>Applications</NavLink>
-                <NavLink to="/land/sites" className={({ isActive }) => isActive ? "active" : ""}>Land sites</NavLink>
-                <NavLink to="/land/allocations" className={({ isActive }) => isActive ? "active" : ""}>Allocations</NavLink>
-                <NavLink to="/land/ptos" className={({ isActive }) => isActive ? "active" : ""}>PTOs</NavLink>
-                <NavLink to="/land/renewals" className={({ isActive }) => isActive ? "active" : ""}>Renewals</NavLink>
-                <NavLink to="/land/succession" className={({ isActive }) => isActive ? "active" : ""}>Succession</NavLink>
-                <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
-              </>
-            )
-            : isCouncilSecretary
-            ? (
-              <>
-                <NavLink to="/secretary" end className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
-                <NavLink to="/secretary/meetings" className={({ isActive }) => isActive ? "active" : ""}>Meetings</NavLink>
-                <NavLink to="/secretary/resolutions" className={({ isActive }) => isActive ? "active" : ""}>Resolutions</NavLink>
-                <NavLink to="/secretary/projects" className={({ isActive }) => isActive ? "active" : ""}>Projects</NavLink>
-                <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
-              </>
-            )
-            : <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>}
+        <button
+          type="button"
+          className="menu-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="main-navigation"
+          onClick={() => setMenuOpen((open) => !open)}
+        >
+          {menuOpen ? "Close menu" : "Menu"}
+        </button>
+
+        <nav id="main-navigation" className={`topnav${menuOpen ? " open" : ""}`} aria-label="Main">
+          {items.map((item) => (
+            <NavLink key={item.to} to={item.to} end={item.end}
+                     className={({ isActive }) => isActive ? "active" : ""}>
+              {item.label}
+              {item.label === "Notifications" && unread > 0
+                ? <span className="nav-count" aria-hidden="true">{unread}</span>
+                : null}
+            </NavLink>
+          ))}
         </nav>
 
-        <div className="who">
+        <div className={`who${menuOpen ? " open" : ""}`}>
+          <Link to={notificationsPath} className="bell"
+                aria-label={unread > 0 ? `Notifications, ${unread} unread` : "Notifications"}>
+            <span aria-hidden="true">🔔</span>
+            {unread > 0 ? <span className="bell-count">{unread > 99 ? "99+" : unread}</span> : null}
+          </Link>
           <div className="avatar" aria-hidden="true">
             {initialsOf(profile?.full_name ?? null, profile?.email ?? "")}
           </div>

@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import { Field, Loading, Notice } from "../../components/ui";
 import { formatDate, formatDateTime } from "../../lib/format";
 import { approveRenewal, declineRenewal, renewalRequests } from "../../registry/landApi";
 import { LAND_TYPE_LABELS } from "../../registry/landTypes";
 import type { RenewalRow } from "../../registry/landTypes";
+import { PageHead } from "../../components/PageHead";
 
 const STATUSES = [
   { value: "pending", label: "Waiting for review" },
@@ -32,13 +34,12 @@ export function LandRenewals() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Renewal requests</h1>
-        <p>
-          Approving a renewal issues a brand new permission and keeps the old one on record as
-          renewed. Nothing is overwritten, and the site does not change.
-        </p>
-      </div>
+      <PageHead
+        title="Renewal requests"
+        description="Approving a renewal issues a brand new permission and keeps the old one on record as renewed. Nothing is overwritten, and the site does not change."
+        crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Renewals" }]}
+        actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

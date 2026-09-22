@@ -57,15 +57,17 @@ export function SignIn() {
   return (
     <div className="centre">
       <div className="centre-card narrow">
-        <div className="brand">
+        <Link to="/" className="brand brand-link" aria-label="TAMS home">
           <div className="brand-mark" aria-hidden="true">T</div>
           <div>
             <div className="brand-name">TAMS</div>
             <div className="brand-sub">Traditional Authority</div>
           </div>
-        </div>
+        </Link>
 
-        <h1 style={{ fontSize: 26, marginTop: 26 }}>Sign in</h1>
+        <Link to="/" className="back-link" style={{ marginTop: 20 }}>← Back to home</Link>
+
+        <h1 style={{ fontSize: 26, marginTop: 12 }}>Sign in</h1>
         <p style={{ color: "var(--muted)", margin: "8px 0 22px", fontSize: 14.5 }}>
           Use your email address and password.
         </p>
@@ -108,10 +110,18 @@ export function SignIn() {
           </button>
         </form>
 
-        <p style={{ marginTop: 18, fontSize: 14, color: "var(--muted)" }}>
-          Staff accounts are created by the Council Administrator. Residents can{" "}
-          <Link to="/register">create an account</Link> and send their details to be verified.
-        </p>
+        <div className="auth-footer">
+          <p>
+            Don't have an account? Residents can{" "}
+            <Link to="/register">create one</Link> and send their details to be verified.
+          </p>
+          <p>
+            Staff accounts are created by the Council Administrator, who invites you by email.
+          </p>
+          <p>
+            <Link to="/">Back to home</Link> · <Link to="/verify/pto">Verify a PTO</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

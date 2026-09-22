@@ -79,7 +79,10 @@ export function Register() {
             We have sent a message to <strong>{email.trim().toLowerCase()}</strong>. Open it to
             confirm your address, then sign in to send us your verification details.
           </p>
-          <Link to="/auth" className="btn btn-primary">Go to sign in</Link>
+          <div className="row" style={{ justifyContent: "center" }}>
+            <Link to="/auth" className="btn btn-primary">Go to sign in</Link>
+            <Link to="/" className="btn btn-ghost">Back to home</Link>
+          </div>
         </div>
       </div>
     );
@@ -88,15 +91,17 @@ export function Register() {
   return (
     <div className="centre">
       <div className="centre-card narrow">
-        <div className="brand">
+        <Link to="/" className="brand brand-link" aria-label="TAMS home">
           <div className="brand-mark" aria-hidden="true">T</div>
           <div>
             <div className="brand-name">TAMS</div>
             <div className="brand-sub">Traditional Authority</div>
           </div>
-        </div>
+        </Link>
 
-        <h1 style={{ fontSize: 26, marginTop: 26 }}>Create a resident account</h1>
+        <Link to="/" className="back-link" style={{ marginTop: 20 }}>← Back to home</Link>
+
+        <h1 style={{ fontSize: 26, marginTop: 12 }}>Create a resident account</h1>
         <p style={{ color: "var(--muted)", margin: "8px 0 22px", fontSize: 14.5 }}>
           First create your sign-in. You will then send your details and documents to the
           Registry Clerk, who checks them against the village register.
@@ -131,9 +136,10 @@ export function Register() {
           </button>
         </form>
 
-        <p style={{ marginTop: 18, fontSize: 14, color: "var(--muted)" }}>
-          Already have an account? <Link to="/auth">Sign in</Link>.
-        </p>
+        <div className="auth-footer">
+          <p>Already have an account? <Link to="/auth">Sign in</Link>.</p>
+          <p><Link to="/">Back to home</Link> · <Link to="/verify/pto">Verify a PTO</Link></p>
+        </div>
       </div>
     </div>
   );

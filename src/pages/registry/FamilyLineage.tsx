@@ -6,6 +6,7 @@ import { LineageList } from "./LineageList";
 import { EndRelationshipDialog, RecordRelationshipDialog } from "./dialogs";
 import { familyLineage, residentRecord, searchResidents } from "../../registry/api";
 import type { LineageRow, ResidentRecord, ResidentSearchRow } from "../../registry/types";
+import { PageHead } from "../../components/PageHead";
 
 /**
  * Family lineage for one resident, built entirely from
@@ -54,10 +55,12 @@ export function FamilyLineage() {
   if (!residentId) {
     return (
       <AppShell>
-        <div className="page-head">
-          <h1>Family lineage</h1>
-          <p>Choose a resident to see how they are related to everyone else on the register.</p>
-        </div>
+        <PageHead
+          title="Family lineage"
+          description="Choose a resident to see how they are related to everyone else on the register."
+          crumbs={[{ label: "Dashboard", to: "/registry" }, { label: "Family lineage" }]}
+          actions={<Link to="/registry" className="btn btn-ghost">Back to dashboard</Link>}
+        />
 
         <div className="card">
           <Field label="Find a resident" htmlFor="lineage-search">

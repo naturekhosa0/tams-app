@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import { Field, Loading, Notice } from "../../components/ui";
 import { formatDate } from "../../lib/format";
 import { meetings, scheduleMeeting } from "../../registry/secretaryApi";
 import { MEETING_TYPES, MEETING_TYPE_LABELS } from "../../registry/secretaryTypes";
 import type { MeetingRow } from "../../registry/secretaryTypes";
+import { PageHead } from "../../components/PageHead";
 
 const STATUSES = [
   { value: "", label: "All" },
@@ -56,18 +57,19 @@ export function Meetings() {
 
   return (
     <AppShell>
-      <div className="page-head row-between">
-        <div>
-          <h1>Meetings</h1>
-          <p>
-            Every council meeting, with who attended, the minutes and the resolutions it produced.
-            Nothing here is ever deleted.
-          </p>
-        </div>
-        <button type="button" className="btn btn-primary" onClick={() => setScheduling(true)}>
-          Schedule a meeting
-        </button>
-      </div>
+      <PageHead
+        title="Meetings"
+        description="Every council meeting, with who attended, the minutes and the resolutions it produced. Nothing here is ever deleted."
+        crumbs={[{ label: "Dashboard", to: "/secretary" }, { label: "Meetings" }]}
+        actions={
+          <>
+            <Link to="/secretary" className="btn btn-ghost">Back to dashboard</Link>
+            <button type="button" className="btn btn-primary" onClick={() => setScheduling(true)}>
+              Schedule a meeting
+            </button>
+          </>
+        }
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}
