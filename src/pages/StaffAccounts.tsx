@@ -7,6 +7,7 @@ import { StaffActionDialog } from "../components/StaffActionDialog";
 import { Field, Loading, Notice, StatusBadge } from "../components/ui";
 import { formatDate } from "../lib/format";
 import type { AssignableRole, StaffAccountRow, StaffAction } from "../lib/types";
+import { PageHead } from "../components/PageHead";
 
 /**
  * Every staff member, their single current role, and whether they can
@@ -72,10 +73,17 @@ export function StaffAccounts() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Staff accounts</h1>
-        <p>Every staff member, their single current role and whether they can currently access the system.</p>
-      </div>
+      <PageHead
+        title="Staff accounts"
+        description="Every staff member, their single current role and whether they can currently access the system."
+        crumbs={[{ label: "Dashboard", to: "/dashboard" }, { label: "Staff accounts" }]}
+        actions={
+          <>
+            <Link to="/dashboard" className="btn btn-ghost">Back to dashboard</Link>
+            <Link to="/staff/new" className="btn btn-primary">Create staff account</Link>
+          </>
+        }
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success

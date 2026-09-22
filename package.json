@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Traditional Authority Management System (TAMS) — staff accounts, the village register, resident accounts, land and permissions to occupy, and the council record.",
+  "description": "Traditional Authority Management System (TAMS) — staff accounts, the village register, resident accounts, land and permissions to occupy, the council record, notifications and the audit trail.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -13,7 +13,7 @@
     "test:db": "bash supabase/tests/run-db-tests.sh",
     "test:all": "npm run typecheck && npm test && npm run test:db",
     "db:push": "supabase db push",
-    "functions:deploy": "supabase functions deploy bootstrap-council-administrator create-staff-account manage-staff-account",
+    "functions:deploy": "supabase functions deploy bootstrap-council-administrator create-staff-account manage-staff-account process-notification-emails emergency-admin-recovery",
     "import:legacy": "node scripts/import-legacy-data.mjs data/legacy-import",
     "import:dry-run": "node scripts/import-legacy-data.mjs data/legacy-import --dry-run"
   },

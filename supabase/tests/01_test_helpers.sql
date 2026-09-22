@@ -65,3 +65,25 @@ create function tams_test.uid_of(p_email text)
 returns uuid language sql stable security definer as $$
   select id from auth.users where email = p_email;
 $$;
+
+-- Resolved as the definer, so a test can look up a staff member's
+-- account even while acting as somebody who could not.
+create function tams_test.staff_account_id_of(p_employee_number text)
+returns uuid language sql stable security definer as $$
+  select ua.id from public.user_accounts ua
+  join public.staff s on s.id = ua.staff_id
+  where s.employee_number = p_employee_number;
+$$;
+
+-- Runs a statement as the database owner and reports what stopped it.
+-- Used only to show that a rule holds even for the most privileged
+-- thing the application ever runs as.
+create function tams_test.try_sql(p_sql text)
+returns text language plpgsql as $$
+begin
+  execute p_sql;
+  return 'OK';
+exception when others then
+  return sqlstate;
+end;
+$$;

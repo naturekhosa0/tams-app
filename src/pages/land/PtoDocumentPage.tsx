@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useSession } from "../../auth/SessionProvider";
+import { homeFor } from "../../components/navigation";
 import { QrCode } from "../../components/QrCode";
 import { Loading, Notice } from "../../components/ui";
 import { formatDate } from "../../lib/format";
@@ -16,6 +18,13 @@ import type { PtoDocument } from "../../registry/landTypes";
  */
 export function PtoDocumentPage() {
   const { ptoId = "" } = useParams();
+  const { session, profile } = useSession();
+  const home = homeFor(profile, Boolean(session));
+  // A Land Officer came from the permissions list; a resident from
+  // their own portal. Either way it is a link, never browser history.
+  const isOfficer = profile?.role_name === "Land Officer";
+  const backTo = isOfficer ? "/land/ptos" : "/resident";
+  const backLabel = isOfficer ? "Back to permissions" : "Back to my land";
   const [document_, setDocument] = useState<PtoDocument | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +38,20 @@ export function PtoDocumentPage() {
     return () => { cancelled = true; };
   }, [ptoId]);
 
-  if (error) return <div className="centre"><div className="centre-card narrow"><Notice kind="error">{error}</Notice></div></div>;
+  if (error) {
+    return (
+      <div className="centre">
+        <div className="centre-card narrow">
+          <h1 style={{ fontSize: 22 }}>That permission is not available</h1>
+          <div style={{ margin: "16px 0 20px" }}><Notice kind="error">{error}</Notice></div>
+          <div className="row" style={{ justifyContent: "center" }}>
+            <Link to={backTo} className="btn btn-primary">{backLabel}</Link>
+            <Link to={home} className="btn btn-ghost">Go to my dashboard</Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
   if (!document_) return <Loading what="Loading the permission" />;
 
   const verificationUrl = `${window.location.origin}/verify/pto/${document_.verification_token}`;
@@ -37,9 +59,10 @@ export function PtoDocumentPage() {
   return (
     <div className="page">
       <div className="row-between no-print" style={{ marginBottom: 18 }}>
-        <button type="button" className="btn btn-ghost" onClick={() => window.history.back()}>
-          Back
-        </button>
+        <div className="row">
+          <Link to={backTo} className="btn btn-ghost">← {backLabel}</Link>
+          <Link to={home} className="btn btn-ghost">Home</Link>
+        </div>
         <button type="button" className="btn btn-primary" onClick={() => window.print()}>
           Print or save as PDF
         </button>

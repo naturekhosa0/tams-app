@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { Loading, Notice } from "../../components/ui";
 import { formatDate } from "../../lib/format";
 import { verifyPto } from "../../registry/landApi";
@@ -24,10 +24,13 @@ const STATUS_WORDS: Record<string, { label: string; kind: "success" | "error" | 
  */
 export function VerifyPto() {
   const { token = "" } = useParams();
+  const navigate = useNavigate();
   const [result, setResult] = useState<PtoVerification | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [typed, setTyped] = useState("");
 
   useEffect(() => {
+    if (!token) { setResult(null); setError(null); return; }
     let cancelled = false;
     verifyPto(token).then((response) => {
       if (cancelled) return;
@@ -40,18 +43,46 @@ export function VerifyPto() {
   return (
     <div className="centre">
       <div className="centre-card narrow">
-        <div className="brand">
+        <Link to="/" className="brand brand-link" aria-label="TAMS home">
           <div className="brand-mark" aria-hidden="true">T</div>
           <div>
             <div className="brand-name">TAMS</div>
             <div className="brand-sub">Traditional Authority</div>
           </div>
-        </div>
+        </Link>
 
-        <h1 style={{ fontSize: 24, marginTop: 24 }}>Permission to occupy</h1>
+        <Link to="/" className="back-link" style={{ marginTop: 20 }}>← Back to TAMS home</Link>
+
+        <h1 style={{ fontSize: 24, marginTop: 12 }}>Permission to occupy</h1>
 
         {error ? <div style={{ marginTop: 16 }}><Notice kind="error">{error}</Notice></div> : null}
-        {!result && !error ? <Loading what="Checking" /> : null}
+        {token && !result && !error ? <Loading what="Checking" /> : null}
+
+        {!token
+          ? (
+            <form
+              style={{ marginTop: 18 }}
+              onSubmit={(event) => {
+                event.preventDefault();
+                const value = typed.trim();
+                if (value) navigate(`/verify/pto/${encodeURIComponent(value)}`);
+              }}
+            >
+              <p className="auth-intro">
+                Enter the verification reference printed on the document, or scan the code on it.
+                Anybody may check a permission; no account is needed.
+              </p>
+              <div className="input-with-button">
+                <input value={typed} aria-label="Verification reference"
+                       placeholder="The reference printed under the code"
+                       onChange={(event) => setTyped(event.target.value)} />
+                <button type="submit" className="btn btn-primary" disabled={!typed.trim()}>
+                  Check
+                </button>
+              </div>
+            </form>
+          )
+          : null}
 
         {result && !result.found
           ? (
@@ -119,6 +150,17 @@ export function VerifyPto() {
                 Checked against the Traditional Authority's records just now.
               </p>
             </>
+          )
+          : null}
+
+        {token
+          ? (
+            <div className="auth-footer">
+              <div className="row" style={{ justifyContent: "center" }}>
+                <Link to="/verify/pto" className="btn btn-ghost">Verify another PTO</Link>
+                <Link to="/" className="btn btn-ghost">Back to TAMS home</Link>
+              </div>
+            </div>
           )
           : null}
       </div>

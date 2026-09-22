@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { homePathFor, useSession } from "../auth/SessionProvider";
 import { supabase } from "../lib/supabaseClient";
 import { Field, Notice } from "../components/ui";
@@ -72,9 +72,10 @@ export function SetPassword() {
             {linkError ??
               "The invitation link is missing, has already been used, or has expired. Ask the Council Administrator to send you a new invitation."}
           </p>
-          <button type="button" className="btn btn-ghost" onClick={() => navigate("/auth")}>
-            Go to sign in
-          </button>
+          <div className="row" style={{ justifyContent: "center" }}>
+            <Link to="/auth" className="btn btn-primary">Go to sign in</Link>
+            <Link to="/" className="btn btn-ghost">Back to home</Link>
+          </div>
         </div>
       </div>
     );
@@ -89,13 +90,16 @@ export function SetPassword() {
             Your password has been set. You can sign in with{" "}
             <strong>{profile?.email ?? session.user.email}</strong> from now on.
           </p>
-          <button
-            type="button"
-            className="btn btn-primary"
-            onClick={() => navigate(homePathFor(profile), { replace: true })}
-          >
-            Continue
-          </button>
+          <div className="row" style={{ justifyContent: "center" }}>
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => navigate(homePathFor(profile), { replace: true })}
+            >
+              Continue to my dashboard
+            </button>
+            <Link to="/" className="btn btn-ghost">Back to home</Link>
+          </div>
         </div>
       </div>
     );
@@ -104,13 +108,13 @@ export function SetPassword() {
   return (
     <div className="centre">
       <div className="centre-card narrow">
-        <div className="brand">
+        <Link to="/" className="brand brand-link" aria-label="TAMS home">
           <div className="brand-mark" aria-hidden="true">T</div>
           <div>
             <div className="brand-name">TAMS</div>
             <div className="brand-sub">Traditional Authority</div>
           </div>
-        </div>
+        </Link>
 
         <h1 style={{ fontSize: 24, marginTop: 22 }}>Choose your password</h1>
         <p style={{ color: "var(--muted)", margin: "8px 0 22px", fontSize: 14.5 }}>
@@ -174,6 +178,13 @@ export function SetPassword() {
             {submitting ? "Saving…" : "Save password"}
           </button>
         </form>
+
+        <div className="auth-footer">
+          <p>
+            Already set a password? <Link to="/auth">Sign in</Link> ·{" "}
+            <Link to="/">Back to home</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

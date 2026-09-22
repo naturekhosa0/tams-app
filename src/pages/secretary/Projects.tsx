@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import { Field, Loading, Notice } from "../../components/ui";
 import { formatDate } from "../../lib/format";
@@ -7,6 +7,7 @@ import {
   createProject, projects as loadProjects, resolutions as loadResolutions,
 } from "../../registry/secretaryApi";
 import type { ProjectRow, ResolutionRow } from "../../registry/secretaryTypes";
+import { PageHead } from "../../components/PageHead";
 
 const STATUSES = [
   { value: "", label: "All" },
@@ -57,18 +58,19 @@ export function Projects() {
 
   return (
     <AppShell>
-      <div className="page-head row-between">
-        <div>
-          <h1>Projects</h1>
-          <p>
-            What the community is building. A project may come out of a resolution or stand on its
-            own, and only a public one is shown to residents.
-          </p>
-        </div>
-        <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
-          Create a project
-        </button>
-      </div>
+      <PageHead
+        title="Projects"
+        description="What the community is building. A project may come out of a resolution or stand on its own, and only a public one is shown to residents."
+        crumbs={[{ label: "Dashboard", to: "/secretary" }, { label: "Projects" }]}
+        actions={
+          <>
+            <Link to="/secretary" className="btn btn-ghost">Back to dashboard</Link>
+            <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
+              Create a project
+            </button>
+          </>
+        }
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

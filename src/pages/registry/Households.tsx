@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import { Field, Loading, Notice, StatusBadge } from "../../components/ui";
 import { CreateHouseholdDialog } from "./CreateHouseholdDialog";
 import { searchHouseholds } from "../../registry/api";
 import type { HouseholdSearchRow } from "../../registry/types";
+import { PageHead } from "../../components/PageHead";
 
 /** Households, identified by their code — never by surname. */
 export function Households() {
@@ -28,18 +29,19 @@ export function Households() {
 
   return (
     <AppShell>
-      <div className="page-head row-between">
-        <div>
-          <h1>Households</h1>
-          <p>
-            Each household is identified by its household code and lives on one residential
-            site. Households may share a surname — the code is what tells them apart.
-          </p>
-        </div>
-        <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
-          Create household
-        </button>
-      </div>
+      <PageHead
+        title="Households"
+        description="Each household is identified by its household code and lives on one residential site. Households may share a surname — the code is what tells them apart."
+        crumbs={[{ label: "Dashboard", to: "/registry" }, { label: "Households" }]}
+        actions={
+          <>
+            <Link to="/registry" className="btn btn-ghost">Back to dashboard</Link>
+            <button type="button" className="btn btn-primary" onClick={() => setCreating(true)}>
+              Create household
+            </button>
+          </>
+        }
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

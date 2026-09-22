@@ -311,7 +311,17 @@ declined, is refused.
   comes later has real history to build on. The system-wide audit trail
   itself is **not** built yet.
 
-## 13. Deliberately not built
+## 13. What came next
+
+Notifications, official communications to residents, internal staff
+messaging and the audit trail were built afterwards — see
+[NOTIFICATIONS-AND-EMAIL.md](NOTIFICATIONS-AND-EMAIL.md) and
+[AUDIT-AND-ADMINISTRATION.md](AUDIT-AND-ADMINISTRATION.md). Everything
+in this document still holds; the Secretary simply also has a
+**Communications** area and a **Messages** inbox now, and every change
+described here is recorded in the audit trail.
+
+## 14. Deliberately not built at the time
 
 Notifications of any kind, the system-wide immutable audit trail,
 Administrator Transfer, payments, GIS or mapping, Chief/Headman/

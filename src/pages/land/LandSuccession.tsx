@@ -7,6 +7,7 @@ import {
   officerAllocations, recordSuccession, returnToAuthority, successionCandidates,
 } from "../../registry/landApi";
 import type { OfficerAllocationRow, SuccessionCandidate } from "../../registry/landTypes";
+import { PageHead } from "../../components/PageHead";
 
 /**
  * A residential permission is perpetual, so when the holder dies the
@@ -48,13 +49,12 @@ export function LandSuccession() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Residential succession</h1>
-        <p>
-          When a residential holder is recorded as deceased, their stand is held here rather than
-          being freed. Nobody else can be given it until the Authority has decided who takes it on.
-        </p>
-      </div>
+      <PageHead
+        title="Residential succession"
+        description="When a residential holder is recorded as deceased, their stand is held here rather than being freed. Nobody else can be given it until the Authority has decided who takes it on."
+        crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Succession" }]}
+        actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

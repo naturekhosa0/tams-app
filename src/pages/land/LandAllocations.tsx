@@ -6,6 +6,7 @@ import { formatDate } from "../../lib/format";
 import { issuePto, officerAllocations, releaseAllocation } from "../../registry/landApi";
 import { LAND_TYPES, LAND_TYPE_LABELS } from "../../registry/landTypes";
 import type { OfficerAllocationRow } from "../../registry/landTypes";
+import { PageHead } from "../../components/PageHead";
 
 const STATUSES = [
   { value: "active", label: "Active" },
@@ -37,13 +38,12 @@ export function LandAllocations() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Allocations</h1>
-        <p>
-          Every allocation TAMS has made. An allocation is never edited into a different one:
-          when it ends, it is kept and a new one is recorded.
-        </p>
-      </div>
+      <PageHead
+        title="Allocations"
+        description="Every allocation TAMS has made. An allocation is never edited into a different one: when it ends, it is kept and a new one is recorded."
+        crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Allocations" }]}
+        actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

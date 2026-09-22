@@ -9,6 +9,7 @@ import {
 } from "../../registry/secretaryApi";
 import type { ResolutionRow, VisibilityChange } from "../../registry/secretaryTypes";
 import { ReasonDialog } from "./MeetingDetail";
+import { PageHead } from "../../components/PageHead";
 
 const STATUSES = [
   { value: "", label: "All" },
@@ -63,13 +64,17 @@ export function Resolutions() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Resolutions</h1>
-        <p>
-          A resolution is recorded from the meeting that decided it, and its decision date is that
-          meeting's date. Resolutions are recorded on the meeting's own page.
-        </p>
-      </div>
+      <PageHead
+        title="Resolutions"
+        description="A resolution is recorded from the meeting that decided it, and its decision date is that meeting's date. Resolutions are recorded on the meeting's own page."
+        crumbs={[{ label: "Dashboard", to: "/secretary" }, { label: "Resolutions" }]}
+        actions={
+          <>
+            <Link to="/secretary" className="btn btn-ghost">Back to dashboard</Link>
+            <Link to="/secretary/meetings" className="btn btn-primary">Go to meetings</Link>
+          </>
+        }
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {success ? <div style={{ marginBottom: 18 }}><Notice kind="success">{success}</Notice></div> : null}

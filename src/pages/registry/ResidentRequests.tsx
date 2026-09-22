@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AppShell } from "../../components/AppShell";
 import { Loading, Notice } from "../../components/ui";
 import { formatDate } from "../../lib/format";
 import { pendingResidentRequests } from "../../registry/api";
 import type { PendingRequestRow } from "../../registry/types";
+import { PageHead } from "../../components/PageHead";
 
 /** People waiting to be matched to a record on the village register. */
 export function ResidentRequests() {
@@ -24,13 +25,12 @@ export function ResidentRequests() {
 
   return (
     <AppShell>
-      <div className="page-head">
-        <h1>Resident accounts</h1>
-        <p>
-          People who have applied for an online account. Each one has to be matched to the
-          record already on the village register before their account works.
-        </p>
-      </div>
+      <PageHead
+        title="Resident requests"
+        description="People who have applied for an online account. Each one has to be matched to the record already on the village register before their account works."
+        crumbs={[{ label: "Dashboard", to: "/registry" }, { label: "Resident requests" }]}
+        actions={<Link to="/registry" className="btn btn-ghost">Back to dashboard</Link>}
+      />
 
       {error ? <Notice kind="error">{error}</Notice> : null}
       {rows === null && !error ? <Loading what="Loading applications" /> : null}
