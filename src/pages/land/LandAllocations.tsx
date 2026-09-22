@@ -40,7 +40,7 @@ export function LandAllocations() {
     <AppShell>
       <PageHead
         title="Allocations"
-        description="Every allocation TAMS has made. An allocation is never edited into a different one: when it ends, it is kept and a new one is recorded."
+        description="Every allocation TAMS has made, current and ended."
         crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Allocations" }]}
         actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
       />
@@ -87,7 +87,7 @@ export function LandAllocations() {
                 </thead>
                 <tbody>
                   {rows.length === 0
-                    ? <tr><td className="empty-row" colSpan={8}>Nothing here.</td></tr>
+                    ? <tr><td className="empty-row" colSpan={8}>No allocations match.</td></tr>
                     : rows.map((row) => (
                       <tr key={row.allocation_id}>
                         <td className="no-wrap">{row.allocation_reference}</td>

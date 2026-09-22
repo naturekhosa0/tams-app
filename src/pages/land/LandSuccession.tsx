@@ -51,7 +51,7 @@ export function LandSuccession() {
     <AppShell>
       <PageHead
         title="Residential succession"
-        description="When a residential holder is recorded as deceased, their stand is held here rather than being freed. Nobody else can be given it until the Authority has decided who takes it on."
+        description="Residential stands held while the Authority decides who takes them on."
         crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Succession" }]}
         actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
       />

@@ -21,6 +21,12 @@
   --neutral-ink: #5c5c74;
   --danger: #d33a54;
   --danger-bg: #fdecef;
+  /* Every control on a filter row or a form row is exactly this tall.
+     Without it a text input, a select and a date field each work their
+     height out from their own internal padding and end up one or two
+     pixels apart, which is what made the filter rows look crooked. */
+  --control-height: 48px;
+  --control-height-sm: 40px;
   --radius-lg: 22px;
   --radius-md: 14px;
   --radius-sm: 10px;
@@ -117,65 +123,211 @@ a { color: var(--accent); }
 
 /* ---------- buttons ------------------------------------------------ */
 
+/* Four kinds of button and no more:
+     primary      the one thing this screen is for
+     ghost        everything else that is safe
+     danger       something that cannot simply be undone
+     link         a lightweight aside
+
+   All four share one height, one radius and one focus ring, so a row of
+   mixed buttons lines up with itself and with the inputs beside it.
+   Every one of them is also a valid target for a <a> as well as a
+   <button>, which is why the height is set rather than left to
+   padding. */
 .btn {
-  border: 0;
+  box-sizing: border-box;
+  border: 1px solid transparent;
   border-radius: 999px;
-  padding: 12px 24px;
+  height: var(--control-height);
+  padding: 0 24px;
   font-size: 14px;
   font-weight: 600;
   font-family: inherit;
+  line-height: 1;
   cursor: pointer;
   text-decoration: none;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+  transition: background 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease, color 0.14s ease;
 }
-.btn:disabled { opacity: 0.6; cursor: not-allowed; }
-.btn-primary { background: var(--gradient); color: #fff; box-shadow: 0 10px 24px rgba(77, 70, 229, 0.28); }
-.btn-primary:not(:disabled):hover { transform: translateY(-1px); }
-.btn-ghost { background: var(--surface); color: var(--ink-soft); border: 1px solid var(--line-strong); }
-.btn-ghost:not(:disabled):hover { background: var(--surface-soft); }
+
+/* A disabled button is not a dimmed enabled one: it stops responding to
+   the pointer as well, which is what tells somebody it is not their
+   turn yet. Every submit in TAMS disables itself while it is running,
+   so this is also what prevents a form being sent twice. */
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.22);
+}
+.btn-primary:not(:disabled):hover { background: var(--accent-deep); box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28); }
+.btn-primary:not(:disabled):active { background: var(--accent-deep); box-shadow: none; }
+
+.btn-ghost {
+  background: var(--surface);
+  color: var(--ink-soft);
+  border-color: var(--line-strong);
+}
+.btn-ghost:not(:disabled):hover { background: var(--surface-soft); border-color: var(--muted); color: var(--ink); }
+.btn-ghost:not(:disabled):active { background: var(--line); }
+
 .btn-link {
-  background: none; border: 0; padding: 0; color: var(--accent);
-  font: inherit; font-size: 14px; cursor: pointer; text-decoration: none;
+  background: none; border: 0; padding: 0; height: auto; color: var(--accent);
+  font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none;
 }
+.btn-link:not(:disabled):hover { text-decoration: underline; }
+
 .btn-block { width: 100%; }
+
+/* A row of buttons under a card heading, used by every dashboard. */
+.quick-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.quick-actions .btn { flex: 0 1 auto; }
 
 /* ---------- forms -------------------------------------------------- */
 
-.field { display: flex; flex-direction: column; gap: 7px; }
-.field label { font-size: 13px; color: var(--ink-soft); font-weight: 500; }
-.field input, .field select {
+.field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.field label {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 500;
+  /* Reserves the label's line so that a field with a one-word label and
+     a field with a long one still start their control at the same
+     height when they sit side by side. */
+  min-height: 18px;
+  line-height: 18px;
+}
+
+.field input,
+.field select,
+.field textarea {
   font-family: inherit;
   font-size: 15px;
   color: var(--ink);
-  padding: 13px 15px;
   border-radius: var(--radius-md);
   border: 1px solid var(--line-strong);
   background: var(--surface);
   outline: none;
   width: 100%;
+  max-width: 100%;
 }
-.field input:focus, .field select:focus {
+
+/* One height, whatever the control is. A select and a date field both
+   bring their own idea of how tall they should be; this overrules them
+   so a row of mixed controls sits on one line. */
+.field input,
+.field select {
+  height: var(--control-height);
+  padding: 0 15px;
+  line-height: normal;
+}
+
+/* A select still needs its arrow drawn, and Safari will not style one
+   that keeps its native appearance. */
+.field select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 40px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+    linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 19px) calc(50% + 2px), calc(100% - 14px) calc(50% + 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+/* A date or time field's own picker button must not push its height. */
+.field input[type="date"],
+.field input[type="time"],
+.field input[type="datetime-local"] { padding-right: 12px; }
+.field input[type="date"]::-webkit-calendar-picker-indicator,
+.field input[type="time"]::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.55; }
+.field input[type="date"]::-webkit-date-and-time-value { text-align: left; }
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
 }
-.field .hint { font-size: 12px; color: var(--muted); }
-.field .error { font-size: 12.5px; color: var(--danger); }
-.field.has-error input, .field.has-error select { border-color: var(--danger); }
 
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 26px; }
+.field .hint { font-size: 12px; color: var(--muted); line-height: 1.45; }
+.field .error { font-size: 12.5px; color: var(--danger); line-height: 1.45; }
+.field.has-error input,
+.field.has-error select,
+.field.has-error textarea { border-color: var(--danger); }
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 26px;
+  /* Top-aligned, so one field's hint never shunts its neighbour's
+     control downwards. */
+  align-items: start;
+}
 .form-actions { margin-top: 26px; }
 
-.input-with-button { position: relative; display: flex; }
-.input-with-button input { padding-right: 46px; }
+/* An input with something beside it. Two shapes use this:
+     a password box with a Show button laid over its right-hand end, and
+     a search box with a real button next to it.
+
+   The input is styled here rather than by `.field input`, because a
+   search box is not always inside a field — the PTO verification page
+   has one standing on its own, and before this it inherited no styling
+   at all and sat square-cornered beside a rounded button. */
+.input-with-button {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.input-with-button > input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 15px;
+  color: var(--ink);
+  height: var(--control-height);
+  padding: 0 15px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  outline: none;
+}
+.input-with-button > input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
+}
+.input-with-button > .btn { flex: 0 0 auto; }
+
+/* Only a box with the Show button laid over it needs room kept clear
+   on the right; a box with a button beside it does not. */
+.input-with-button:has(.reveal) { gap: 0; }
+.input-with-button:has(.reveal) > input { padding-right: 58px; }
+
 .reveal {
   position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  background: none; border: 0; cursor: pointer; padding: 6px;
-  color: var(--muted); font-size: 12px; font-family: inherit;
+  /* Opaque rather than transparent: in a browser that does not support
+     :has(), the input keeps its ordinary padding and a long password
+     would otherwise run underneath these letters. */
+  background: var(--surface); border: 0; cursor: pointer; padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  color: var(--muted); font-size: 12px; font-weight: 600; font-family: inherit;
 }
+.reveal:hover { color: var(--accent); }
 
 /* ---------- notices ------------------------------------------------ */
 
@@ -231,7 +383,27 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
 .badge-active { background: var(--success-bg); color: var(--success-ink); }
 .badge-deactivated { background: var(--neutral-bg); color: var(--neutral-ink); }
 
-.filters { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 18px; align-items: end; }
+/* The filter row above a table.
+   
+   This used to be `align-items: end`, which bottom-aligned each field.
+   A field with a hint under its input is taller than one without, so
+   its input was lifted clear of its neighbours — which is exactly what
+   made the Projects row (Search, Status, Visibility) look crooked.
+   Aligned to the top instead, every label sits on one line and every
+   control sits on the next, and a hint simply hangs below without
+   moving anything. */
+.filters {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.filters-2 { grid-template-columns: 1.4fr 1fr; }
+.filters-4 { grid-template-columns: 1.6fr 1fr 1fr 1fr; }
+/* A filter row that ends in a button: the button lines up with the
+   controls, not with the labels above them. */
+.filters .filter-action { display: flex; align-items: flex-end; height: 100%; }
+.filters .filter-action .btn { margin-top: 25px; }
 
 /* ---------- centred cards (landing, sign in, password) ------------- */
 
@@ -244,9 +416,12 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
   padding: 34px 36px 38px;
 }
 .centre-card.narrow { max-width: 430px; }
-.centre-card.wide { max-width: 1060px; padding: 46px 52px 54px; }
-.centre-card.wide h1 { font-size: 40px; line-height: 1.12; margin-top: 26px; }
-.centre-card.wide p { color: var(--ink-soft); font-size: 15.5px; line-height: 1.6; margin: 16px 0 30px; max-width: 560px; }
+/* The landing card is sized to its content. It used to be 1060px wide
+   around a 560px column of text, which left half of it empty once the
+   explanatory blocks came out. */
+.centre-card.wide { max-width: 620px; padding: 42px 44px 44px; }
+.centre-card.wide h1 { font-size: 38px; line-height: 1.12; margin-top: 24px; }
+.centre-card.wide p { color: var(--ink-soft); font-size: 15.5px; line-height: 1.6; margin: 14px 0 28px; }
 
 .tabs { display: flex; gap: 6px; background: var(--surface-soft); padding: 5px; border-radius: 999px; margin: 20px 0 26px; }
 .tab { flex: 1; text-align: center; padding: 9px 14px; border-radius: 999px; font-size: 14px; font-weight: 600; color: var(--muted); }
@@ -274,11 +449,21 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
 
 .row-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
-.btn-small { padding: 8px 14px; font-size: 13px; white-space: nowrap; }
-.btn-danger { background: var(--danger-bg); color: #9c1f38; border: 1px solid #f4c6cf; }
-.btn-danger:not(:disabled):hover { background: #fbdde3; }
-.btn-restore { background: var(--success-bg); color: var(--success-ink); border: 1px solid #b6e9cd; }
-.btn-restore:not(:disabled):hover { background: #c8f0da; }
+/* Inside a table row, where a full-height button would push the row
+   out of shape. */
+.btn-small { height: var(--control-height-sm); padding: 0 16px; font-size: 13px; }
+
+/* Something that cannot simply be undone. Deliberately not a solid red
+   fill: it has to read as dangerous without shouting over the primary
+   action on the same screen. Every one of these is behind a
+   confirmation dialog as well. */
+.btn-danger { background: var(--danger-bg); color: #9c1f38; border-color: #f0b7c3; }
+.btn-danger:not(:disabled):hover { background: #fbdde3; border-color: var(--danger); color: #8a1b32; }
+.btn-danger:not(:disabled):active { background: #f8ccd5; }
+.btn-danger:focus-visible { outline-color: var(--danger); }
+
+.btn-restore { background: var(--success-bg); color: var(--success-ink); border-color: #a5e3c2; }
+.btn-restore:not(:disabled):hover { background: #c8f0da; border-color: var(--success-ink); }
 
 .muted-note { color: var(--muted); font-size: 13px; }
 
@@ -315,24 +500,15 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
 .dialog-details .detail-item { border-bottom: 1px solid var(--line); }
 .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; }
 
+/* A textarea is the one control that does not take the shared height:
+   it grows with its content. Everything else about it — the border,
+   the focus ring, the error state — comes from the shared rule above. */
 .field textarea {
-  font-family: inherit;
-  font-size: 15px;
-  color: var(--ink);
   padding: 13px 15px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--line-strong);
-  background: var(--surface);
-  outline: none;
-  width: 100%;
+  line-height: 1.55;
   resize: vertical;
-  min-height: 84px;
+  min-height: 96px;
 }
-.field textarea:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.14);
-}
-.field.has-error textarea { border-color: var(--danger); }
 
 .confirm-line {
   display: flex;
@@ -794,6 +970,41 @@ td.new-value { font-weight: 600; }
   .page-head .row { width: 100%; }
   .page-head .row > * { flex: 1 1 auto; text-align: center; }
   .tabs { flex-wrap: wrap; }
+
+  /* On a phone a page's own actions are the widest thing on it, so they
+     share the width evenly rather than one of them wrapping alone. */
+  .page-head .row > .btn { flex: 1 1 140px; min-width: 0; }
+  .quick-actions .btn { flex: 1 1 100%; }
+  .dialog-actions { flex-direction: column-reverse; }
+  .dialog-actions .btn { width: 100%; }
+  .row-actions .btn { flex: 1 1 auto; }
+}
+
+/* ---------- small screens: nothing may run off the edge -------------- */
+
+@media (max-width: 480px) {
+  /* A long email address or reference must wrap rather than widen the
+     page. Horizontal scrolling belongs to tables, and nothing else. */
+  .who-email, .brand-name, .certificate-token { overflow-wrap: anywhere; }
+  .centre { padding: 24px 16px; }
+  .centre-card { padding: 26px 20px 28px; }
+  .card { padding: 20px 18px; }
+  .page { padding: 16px 16px 44px; }
+  .btn { padding: 0 18px; }
+  .stat { padding: 18px 18px; }
+  .stat-value { font-size: 34px; }
+  .page-head h1 { font-size: 25px; }
 }
 
 .forgot-password-line { margin-top: 14px; text-align: center; font-size: 14px; }
+
+/* ---------- the inactivity warning ----------------------------------- */
+
+.idle-dialog { max-width: 420px; text-align: left; }
+.idle-dialog h2 { font-size: 21px; }
+.idle-dialog .dialog-intro strong {
+  /* The countdown changes every second, so it is given a fixed-width
+     figure: the sentence must not twitch as the digits change. */
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}

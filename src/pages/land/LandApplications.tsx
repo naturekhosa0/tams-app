@@ -50,7 +50,7 @@ export function LandApplications() {
     <AppShell>
       <PageHead
         title="Land applications"
-        description="Residents apply for a kind of land, never for a particular site. You decide the application first, and only then choose the site."
+        description="Applications for land, and the decisions made on them."
         crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Applications" }]}
         actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
       />
@@ -100,7 +100,7 @@ export function LandApplications() {
                 </thead>
                 <tbody>
                   {rows.length === 0
-                    ? <tr><td className="empty-row" colSpan={8}>Nothing here.</td></tr>
+                    ? <tr><td className="empty-row" colSpan={8}>No land applications match.</td></tr>
                     : rows.map((row) => (
                       <tr key={row.application_id} style={{ cursor: "pointer" }}
                           onClick={() => navigate(`/land/applications/${row.application_id}`)}>

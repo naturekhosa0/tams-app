@@ -59,7 +59,7 @@ export function Meetings() {
     <AppShell>
       <PageHead
         title="Meetings"
-        description="Every council meeting, with who attended, the minutes and the resolutions it produced. Nothing here is ever deleted."
+        description="Every council meeting, its attendance, minutes and resolutions."
         crumbs={[{ label: "Dashboard", to: "/secretary" }, { label: "Meetings" }]}
         actions={
           <>

@@ -7,6 +7,7 @@
 // refusals into something readable.
 
 import { supabase } from "../lib/supabaseClient";
+import { readableError } from "../lib/errorMessage";
 import type {
   AvailableSite, CandidateRow, HouseholdRecord, HouseholdSearchRow, LineageRow,
   PendingRequestRow, RegistryStats, RelationshipType, ResidentRecord,
@@ -28,11 +29,9 @@ export const NEEDS_CONFIRMATION = {
 } as const;
 
 function failure(error: { code?: string; message: string }): RegistryResult<never> {
-  // PostgreSQL puts the raised message where we want it; strip the
-  // prefix Supabase sometimes adds.
-  const message = (error.message ?? "Something went wrong.")
-    .replace(/^[A-Z0-9]{5}:\s*/, "")
-    .trim();
+  // Wording TAMS wrote is what should be shown. Wording PostgreSQL
+  // wrote is replaced, because it was written for a log.
+  const message = readableError(error.message);
 
   if (error.code === "42501") {
     return {

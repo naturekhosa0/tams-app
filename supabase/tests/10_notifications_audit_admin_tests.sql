@@ -1626,12 +1626,24 @@ select tams_test.check(
   (select actor_role = 'Council Administrator'
           and actor_label = 'Nature Khosa'
           and reason = 'End of term of office'
+          -- the office moved from one named person to another
           and old_values ->> 'administrator' = 'Nature Khosa'
           and new_values ->> 'administrator' = 'Lance Officer'
-          and new_values ->> 'outgoing_new_role' = 'Registry Clerk'
+          -- and both of their roles are recorded on both sides, so the
+          -- trail reads as a before and an after rather than a list
+          and old_values ->> 'incoming_administrator_role' = 'Land Officer'
+          and new_values ->> 'incoming_administrator_role' = 'Council Administrator'
+          and old_values ->> 'outgoing_administrator_role' = 'Council Administrator'
+          and new_values ->> 'outgoing_administrator_role' = 'Registry Clerk'
+          -- every field it names as changed is present on both sides
+          and old_values ?& changed_fields
+          and new_values ?& changed_fields
+          -- and the actor is recorded once, in the row's own columns,
+          -- never repeated inside the values
+          and not (new_values ? 'performed_by')
    from (select * from public.audit_logs
           where action = 'TRANSFER_COUNCIL_ADMINISTRATOR'
-            and new_values ? 'outgoing_outcome'
+            and new_values ? 'outgoing_administrator_role'
           order by created_at desc, id desc limit 1) as t)
   and (select count(*) = 1 from public.notifications
         where title = 'You are now the Council Administrator'
@@ -1820,13 +1832,18 @@ select tams_test.check(
   'REC 116 — the recovery is audited, with who, from what, and why',
   (select action = 'EMERGENCY_ADMIN_RECOVERY'
           and entity_reference = '2026070'
-          and old_values ->> 'role' = 'Council Secretary'
-          and new_values ->> 'role' = 'Council Administrator'
-          and new_values ->> 'recovered_by' = 'emergency recovery process'
+          -- the role they held, and the role they now hold
+          and old_values ->> 'administrator_role' = 'Council Secretary'
+          and new_values ->> 'administrator_role' = 'Council Administrator'
+          -- and how many administrators could sign in, before and after
+          and (old_values ->> 'valid_administrators')::int = 0
+          and (new_values ->> 'valid_administrators')::int = 1
+          and old_values ?& changed_fields
+          and new_values ?& changed_fields
           and reason = 'The last administrator left and their sign-in was removed'
           and actor_role = 'system'
    from (select * from public.audit_logs
-          where action = 'EMERGENCY_ADMIN_RECOVERY' and new_values ? 'recovered_by'
+          where action = 'EMERGENCY_ADMIN_RECOVERY' and new_values ? 'administrator_role'
           order by created_at desc, id desc limit 1) as t)
 );
 

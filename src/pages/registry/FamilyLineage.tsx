@@ -57,7 +57,7 @@ export function FamilyLineage() {
       <AppShell>
         <PageHead
           title="Family lineage"
-          description="Choose a resident to see how they are related to everyone else on the register."
+          description="Choose a resident to see their family relationships."
           crumbs={[{ label: "Dashboard", to: "/registry" }, { label: "Family lineage" }]}
           actions={<Link to="/registry" className="btn btn-ghost">Back to dashboard</Link>}
         />

@@ -66,7 +66,7 @@ export function Resolutions() {
     <AppShell>
       <PageHead
         title="Resolutions"
-        description="A resolution is recorded from the meeting that decided it, and its decision date is that meeting's date. Resolutions are recorded on the meeting's own page."
+        description="Every resolution the council has taken, and where it stands."
         crumbs={[{ label: "Dashboard", to: "/secretary" }, { label: "Resolutions" }]}
         actions={
           <>
@@ -105,7 +105,7 @@ export function Resolutions() {
           <div className="card">
             <h2 className="card-title">{rows.length} resolution{rows.length === 1 ? "" : "s"}</h2>
             {rows.length === 0
-              ? <p className="muted-note">Nothing here.</p>
+              ? <p className="muted-note">No resolutions match.</p>
               : (
                 <div className="stack">
                   {rows.map((row) => (

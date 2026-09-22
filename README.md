@@ -137,6 +137,14 @@ allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
 * **No half-created people.** The staff record and the user account are
   written in one transaction, and the invited auth user is deleted again
   if that transaction fails.
+* **A session nobody is using ends by itself.** Thirty minutes for
+  staff, sixty for a resident, with two minutes' warning first. Only a
+  click, a key, a touch or a real navigation counts as use — a page
+  sitting open, a tab regaining focus and the background account check
+  do not. Signing out reaches every open tab at once.
+* **Nothing secret is ever committed.** `npm test` scans every tracked
+  file for anything shaped like a real key and fails the build rather
+  than letting one be published.
 
 ## Layout
 
@@ -147,7 +155,7 @@ supabase/migrations/      the foundation, staff management, village records,
                           land model, land functions, council records,
                           council functions, notifications, audit trail,
                           communications, administrator transfer,
-                          password reset audit
+                          password reset audit, final hardening
 data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
                           manage-staff-account, process-notification-emails,
@@ -159,7 +167,8 @@ docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
                           REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md, LAND.md,
                           COUNCIL-SECRETARY.md, NOTIFICATIONS-AND-EMAIL.md,
                           AUDIT-AND-ADMINISTRATION.md, NAVIGATION.md,
-                          PASSWORD-RESET.md
+                          PASSWORD-RESET.md, DEPLOYMENT.md, FINAL-QA.md,
+                          DEMO.md, DEMO-RESET.md
 ```
 
 ## Tests
@@ -168,4 +177,4 @@ docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
 npm run test:all
 ```
 
-860 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+969 automated checks: see [docs/TESTING.md](docs/TESTING.md).

@@ -81,24 +81,13 @@ export function RegistryDashboard() {
               </div>
 
               <div className="card">
-                <h2 className="card-title">What you can do</h2>
-                <div className="bullet-list">
-                  <p>
-                    <Link to="/registry/residents">Search the register</Link>{" "}
-                    by identity number, name, household code, site code or address.
-                  </p>
-                  <p>
-                    <Link to="/registry/households">View households</Link>{" "}
-                    with their site, address, head and members — and create a new one.
-                  </p>
-                  <p>
-                    <Link to="/registry/lineage">Look up family lineage</Link>{" "}
-                    for any resident, and record new relationships.
-                  </p>
-                  <p style={{ color: "var(--muted)" }}>
-                    Land sites and land allocations are shown for context but are the
-                    Land Officer's to change, not yours.
-                  </p>
+                <h2 className="card-title">Quick actions</h2>
+                <div className="quick-actions">
+                  <Link to="/registry/residents" className="btn btn-primary">Search the register</Link>
+                  <Link to="/registry/households" className="btn btn-ghost">Households</Link>
+                  <Link to="/registry/lineage" className="btn btn-ghost">Family lineage</Link>
+                  <Link to="/registry/resident-accounts" className="btn btn-ghost">Resident requests</Link>
+                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>

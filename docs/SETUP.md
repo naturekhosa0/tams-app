@@ -70,6 +70,12 @@ That applies every migration:
   internal staff messaging and work requests.
 * `20261002090000_administrator_transfer.sql` — Administrator Transfer,
   emergency recovery, and the single-active-administrator rule.
+* `20261003090000_password_reset_audit.sql` — the one safe line a
+  completed password reset leaves in the audit trail.
+* `20261004090000_final_hardening.sql` — the final security pass: the
+  trigger functions' EXECUTE revoked from PUBLIC, and the two
+  hand-written audit events corrected so each reads as a real before
+  and after.
 
 If a page reports that a function is "not found in the schema cache", a
 migration has not reached the project yet — run
@@ -90,9 +96,19 @@ accounts are still created solely by the Council Administrator's
 invitation, and nothing a member of the public can do produces one.
 
 In **Authentication → URL Configuration**, set the **Site URL** to where
-the app runs (`http://localhost:5173` while developing) and add
-`<site-url>/set-password` to the **Redirect URLs**. That is where
-invitation emails land.
+the app runs (`http://localhost:5173` while developing) and add **both**
+of these to the **Redirect URLs**:
+
+| Redirect URL | What lands there |
+| --- | --- |
+| `<site-url>/set-password` | a staff invitation |
+| `<site-url>/reset-password` | a password reset |
+
+While developing that means `http://localhost:5173/set-password` and
+`http://localhost:5173/reset-password`. Add the deployed equivalents
+when you deploy, and leave the localhost ones in place so development
+keeps working. If a URL is not listed here, Supabase refuses to send
+anybody back to it and the link fails.
 
 ### Email delivery — set this up before creating any staff
 
@@ -167,16 +183,20 @@ npx supabase secrets set TAMS_ADMIN_RECOVERY_SECRET="$(openssl rand -hex 32)"
    **Integrations → Cron** (or **Database → Extensions** and enable
    `pg_cron` and `pg_net`), then add a job that runs every five minutes:
 
+Fill in your own project reference, anon key and worker secret where the
+placeholders are. Run this in the SQL Editor, where nothing is written to
+a file — never commit the finished statement.
+
 ```sql
 select cron.schedule(
   'tams-notification-emails', '*/5 * * * *',
   $$
   select net.http_post(
-    url     := 'https://xgbokyxaampcefvxnlxi.supabase.co/functions/v1/process-notification-emails',
+    url     := 'https://YOUR-PROJECT-REF.supabase.co/functions/v1/process-notification-emails',
     headers := jsonb_build_object(
                  'Content-Type', 'application/json',
-                 'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnYm9reXhhYW1wY2VmdnhubHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MTE3MzgsImV4cCI6MjEwNTM4NzczOH0.AdvmT80gLIhlOfRkOMGfUtDjXwrNO2gx8P7hVBQHnTU',
-                 'x-worker-secret', 'si+Ieh3bE4e3fMODmlCLmLkv5wKlFPL7oLJw25a1wA0='),
+                 'Authorization', 'Bearer YOUR-SUPABASE-ANON-KEY',
+                 'x-worker-secret', 'YOUR-TAMS-WORKER-SECRET'),
     body    := '{"limit": 50}'::jsonb);
   $$);
 ```

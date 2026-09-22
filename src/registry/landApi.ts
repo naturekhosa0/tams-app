@@ -5,6 +5,7 @@
 // here is trusted; this layer only shapes the calls.
 
 import { supabase } from "../lib/supabaseClient";
+import { readableError } from "../lib/errorMessage";
 import type {
   AvailableSiteRow, Eligibility, LandType, OfficerApplication, OfficerApplicationRow,
   OfficerAllocationRow, OfficerDashboard, OfficerPtoRow, OfficerSiteRow, PtoDocument,
@@ -15,7 +16,7 @@ import type {
 export type LandResult<T> = { ok: true; data: T } | { ok: false; code: string; message: string };
 
 function failure(error: { code?: string; message: string }): LandResult<never> {
-  const message = (error.message ?? "Something went wrong.").replace(/^[A-Z0-9]{5}:\s*/, "").trim();
+  const message = readableError(error.message);
   if (error.code === "42501") {
     return { ok: false, code: "42501", message: "You are not allowed to do that." };
   }

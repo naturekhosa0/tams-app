@@ -54,7 +54,7 @@ export function TransferAdministrator() {
     <AppShell>
       <PageHead
         title="Transfer administrator"
-        description="Pass the Council Administrator role to another member of staff. This is the only way it ever moves."
+        description="Pass the Council Administrator role to another member of staff."
         crumbs={[{ label: "Dashboard", to: "/dashboard" }, { label: "Transfer administrator" }]}
         back={{ to: "/dashboard", label: "Back to dashboard" }}
       />

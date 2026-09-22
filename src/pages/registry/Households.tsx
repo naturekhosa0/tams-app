@@ -31,7 +31,7 @@ export function Households() {
     <AppShell>
       <PageHead
         title="Households"
-        description="Each household is identified by its household code and lives on one residential site. Households may share a surname — the code is what tells them apart."
+        description="Every household on the register, its site and its head."
         crumbs={[{ label: "Dashboard", to: "/registry" }, { label: "Households" }]}
         actions={
           <>

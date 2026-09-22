@@ -27,7 +27,7 @@ export function ResidentRequests() {
     <AppShell>
       <PageHead
         title="Resident requests"
-        description="People who have applied for an online account. Each one has to be matched to the record already on the village register before their account works."
+        description="Residents who have applied for an online account."
         crumbs={[{ label: "Dashboard", to: "/registry" }, { label: "Resident requests" }]}
         actions={<Link to="/registry" className="btn btn-ghost">Back to dashboard</Link>}
       />

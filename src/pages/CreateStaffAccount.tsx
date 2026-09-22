@@ -83,7 +83,7 @@ export function CreateStaffAccount() {
     <AppShell>
       <PageHead
         title="Create staff account"
-        description="The staff member receives an email invitation and chooses their own password."
+        description="The staff member is invited by email and chooses their own password."
         crumbs={[
           { label: "Dashboard", to: "/dashboard" },
           { label: "Staff accounts", to: "/staff" },

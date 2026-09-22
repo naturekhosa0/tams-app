@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { homePathFor, useSession } from "../auth/SessionProvider";
 import { supabase } from "../lib/supabaseClient";
 import { Field, Loading, Notice } from "../components/ui";
+import { IDLE_SIGN_OUT_MESSAGE, wasSignedOutForIdling } from "../auth/idleTimeout";
 
 /**
  * The single sign-in page for every staff role.
@@ -14,6 +15,10 @@ import { Field, Loading, Notice } from "../components/ui";
 export function SignIn() {
   const { loading, session, profile, refresh } = useSession();
   const navigate = useNavigate();
+  const location = useLocation();
+  // Arriving here because a session timed out is not an error the
+  // person made, so it is said plainly and only once.
+  const timedOut = wasSignedOutForIdling(location.search);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,6 +77,10 @@ export function SignIn() {
           Use your email address and password.
         </p>
 
+        {timedOut && !error
+          ? <div style={{ marginBottom: 18 }}><Notice kind="info">{IDLE_SIGN_OUT_MESSAGE}</Notice></div>
+          : null}
+
         <form onSubmit={handleSubmit} className="stack" noValidate>
           {error ? <Notice kind="error">{error}</Notice> : null}
 
@@ -116,15 +125,7 @@ export function SignIn() {
 
         <div className="auth-footer">
           <p>
-            Don't have an account? Residents can{" "}
-            <Link to="/register">create one</Link> and send their details to be verified.
-          </p>
-          <p>
-            Staff accounts are created by the Council Administrator, who invites you by email.
-          </p>
-          <p>
-            Forgotten your password? <Link to="/forgot-password">Reset it</Link> — residents and
-            staff alike.
+            Don't have an account? <Link to="/register">Create one</Link>
           </p>
           <p>
             <Link to="/">Back to home</Link> · <Link to="/verify/pto">Verify a PTO</Link>

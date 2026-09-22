@@ -44,7 +44,7 @@ export function Messages() {
     <AppShell>
       <PageHead
         title="Messages"
-        description="Internal messages between the roles: clarifications, handovers, and requests for another role to do its part."
+        description="Internal messages and work requests between staff."
         crumbs={[{ label: "Home", to: home }, { label: "Messages" }]}
         actions={
           <>

@@ -51,7 +51,7 @@ export function Notifications() {
     <AppShell>
       <PageHead
         title="Notifications"
-        description="Everything TAMS has told you. Opening one here does not stand for attendance, acceptance or agreement — only that you read it."
+        description="Everything TAMS has told you."
         crumbs={[{ label: "Home", to: home }, { label: "Notifications" }]}
         actions={
           <>
@@ -91,7 +91,7 @@ export function Notifications() {
               <p className="muted-note" style={{ marginTop: 18 }}>
                 {scope === "archived"
                   ? "You have not archived anything."
-                  : "Nothing here. TAMS will tell you when something happens."}
+                  : "You have no notifications. TAMS will tell you when something happens."}
               </p>
             )
             : (
