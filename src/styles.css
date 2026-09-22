@@ -518,3 +518,87 @@ td .self { color: var(--muted); font-weight: 400; font-size: 13px; }
     padding: 0;
   }
 }
+
+/* ---------- the council record -------------------------------------- */
+
+/* Paragraphs of real text read badly ranged right, which is what an
+   ordinary detail value does. These stack the label above the text. */
+.detail-item.stacked { display: block; }
+.detail-item.stacked .value {
+  display: block;
+  text-align: left;
+  font-weight: 400;
+  margin-top: 6px;
+  line-height: 1.65;
+}
+
+
+.minutes-body {
+  margin-top: 16px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-soft);
+  white-space: pre-wrap;
+  line-height: 1.7;
+  font-size: 14.5px;
+}
+
+.amendment {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  background: var(--surface-soft);
+}
+.amendment .name { font-weight: 600; font-size: 14px; }
+.amendment + .amendment { margin-top: 10px; }
+
+.badge-overdue { background: var(--danger-bg); color: var(--danger); }
+.status-note.overdue { color: var(--danger); font-weight: 600; }
+
+.project-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
+  background: var(--surface-soft);
+}
+.project-card + .project-card { margin-top: 12px; }
+.project-card .name { font-weight: 600; font-size: 15.5px; }
+
+.milestone-list {
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.milestone {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.milestone:last-child { border-bottom: 0; }
+.milestone-mark {
+  width: 16px;
+  flex: none;
+  text-align: center;
+  font-weight: 700;
+  color: var(--muted);
+}
+.milestone-title { flex: 1; min-width: 0; }
+.milestone-status {
+  flex: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.milestone-completed .milestone-mark { color: var(--success-ink); }
+.milestone-completed .milestone-title { color: var(--ink-soft); }
+.milestone-completed .milestone-status { color: var(--success-ink); }
+.milestone-in_progress .milestone-mark,
+.milestone-in_progress .milestone-status { color: var(--accent); }
+.milestone-overdue .milestone-mark,
+.milestone-overdue .milestone-status { color: var(--danger); }

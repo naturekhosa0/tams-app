@@ -1,7 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./auth/SessionProvider";
 import {
-  RequireAdministrator, RequireLandOfficer, RequireRegistryClerk, RequireResident, RequireStaff,
+  RequireAdministrator, RequireCouncilSecretary, RequireLandOfficer, RequireRegistryClerk,
+  RequireResident, RequireStaff,
   RequireStaffOrResident,
 } from "./components/guards";
 import { isConfigured } from "./lib/supabaseClient";
@@ -35,6 +36,12 @@ import { LandRenewals } from "./pages/land/LandRenewals";
 import { LandSuccession } from "./pages/land/LandSuccession";
 import { PtoDocumentPage } from "./pages/land/PtoDocumentPage";
 import { VerifyPto } from "./pages/land/VerifyPto";
+import { SecretaryDashboard } from "./pages/secretary/SecretaryDashboard";
+import { Meetings } from "./pages/secretary/Meetings";
+import { MeetingDetail } from "./pages/secretary/MeetingDetail";
+import { Resolutions } from "./pages/secretary/Resolutions";
+import { Projects } from "./pages/secretary/Projects";
+import { ProjectDetail } from "./pages/secretary/ProjectDetail";
 import { Notice } from "./components/ui";
 
 function NotConfigured() {
@@ -104,6 +111,14 @@ export default function App() {
           <Route path="/land/ptos" element={<RequireLandOfficer><LandPtos /></RequireLandOfficer>} />
           <Route path="/land/renewals" element={<RequireLandOfficer><LandRenewals /></RequireLandOfficer>} />
           <Route path="/land/succession" element={<RequireLandOfficer><LandSuccession /></RequireLandOfficer>} />
+
+          {/* The active Council Secretary only */}
+          <Route path="/secretary" element={<RequireCouncilSecretary><SecretaryDashboard /></RequireCouncilSecretary>} />
+          <Route path="/secretary/meetings" element={<RequireCouncilSecretary><Meetings /></RequireCouncilSecretary>} />
+          <Route path="/secretary/meetings/:meetingId" element={<RequireCouncilSecretary><MeetingDetail /></RequireCouncilSecretary>} />
+          <Route path="/secretary/resolutions" element={<RequireCouncilSecretary><Resolutions /></RequireCouncilSecretary>} />
+          <Route path="/secretary/projects" element={<RequireCouncilSecretary><Projects /></RequireCouncilSecretary>} />
+          <Route path="/secretary/projects/:projectId" element={<RequireCouncilSecretary><ProjectDetail /></RequireCouncilSecretary>} />
 
           {/* The permission document itself. Who may open which one is
               decided in the database, not here: a resident sees their

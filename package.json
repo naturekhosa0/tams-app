@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Traditional Authority Management System (TAMS) — staff accounts, the village register, resident accounts, land and permissions to occupy.",
+  "description": "Traditional Authority Management System (TAMS) — staff accounts, the village register, resident accounts, land and permissions to occupy, and the council record.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

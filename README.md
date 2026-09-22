@@ -5,8 +5,9 @@ Security).
 
 The foundation, the Council Administrator's staff management, the
 Registry Clerk's register, resident accounts, and the Land Officer's
-land, allocations and permissions to occupy. Council Secretary, meeting,
-project and audit work are **not** built yet.
+land, allocations and permissions to occupy, and the Council Secretary's
+meetings, minutes, resolutions and community projects. Notifications and
+the system-wide audit trail are **not** built yet.
 
 ## What works today
 
@@ -26,6 +27,8 @@ project and audit work are **not** built yet.
 | **Land applications** | A verified resident applies for residential, farming, business or burial land. They never choose a site. |
 | **Land Officer** | Registers sites, reviews applications, allocates a site, issues the permission to occupy, and handles renewals, revocations and succession. |
 | **Permission to occupy** | A printable document with a QR code, and a public page anyone can use to check that it is genuine. |
+| **Council Secretary** | Meetings, attendance, draft and final minutes, amendments to final minutes, resolutions, projects and milestones. |
+| **Community updates** | Residents read the published resolutions and projects, with each project's milestone progress. |
 
 ## Getting started
 
@@ -49,6 +52,11 @@ land_sites ───< households ───< residents ───< family_relation
      └───< land_allocations >─── residents
 
 residents ───< land_applications ───< land_allocations ───< ptos ───< pto_renewal_requests
+
+council_meetings ───< meeting_attendance
+        ├───< meeting_minutes ───< meeting_minutes_amendments
+        └───< council_resolutions ───< community_projects ───< project_milestones
+                     └──────────────────────┴───< visibility_changes
 ```
 
 * **roles** — the four roles, seeded by the migration: Registry Clerk,
@@ -65,6 +73,11 @@ record on the village register.
 Land is only ever **residential**, **farming**, **business** or
 **burial**. Grazing land is not allocated by TAMS and no permission to
 occupy is issued for it. See [docs/LAND.md](docs/LAND.md).
+
+The council's own record — meetings, minutes, resolutions and projects —
+is the Council Secretary's. Final minutes are locked and corrected by
+amendment, and a resident sees only what has been published and
+confirmed. See [docs/COUNCIL-SECRETARY.md](docs/COUNCIL-SECRETARY.md).
 
 The village records came from the legacy import. An active Registry Clerk
 may read all five tables and write to residents, households and family
@@ -107,7 +120,8 @@ allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
 src/                      React app (pages, session, guards)
 supabase/migrations/      the foundation, staff management, village records,
                           registry clerk, relationship history, resident accounts,
-                          land model, land functions
+                          land model, land functions, council records,
+                          council functions
 data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
                           manage-staff-account
@@ -115,7 +129,8 @@ supabase/tests/           database test suite (runs on plain PostgreSQL)
 tests/                    edge function rule tests
 scripts/                  one-time administrator bootstrap, legacy import
 docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
-                          REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md, LAND.md
+                          REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md, LAND.md,
+                          COUNCIL-SECRETARY.md
 ```
 
 ## Tests
@@ -124,4 +139,4 @@ docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
 npm run test:all
 ```
 
-432 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+552 automated checks: see [docs/TESTING.md](docs/TESTING.md).

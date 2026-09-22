@@ -3,6 +3,7 @@ import { useSession } from "../../auth/SessionProvider";
 import { Loading, Notice } from "../../components/ui";
 import { VerificationForm } from "./VerificationForm";
 import { ResidentLand } from "../land/ResidentLand";
+import { CommunityUpdates } from "../community/CommunityUpdates";
 import { formatDate, formatDateTime, initialsOf } from "../../lib/format";
 import { ensureResidentAccount, residentPortal } from "../../registry/residentApi";
 import type { ResidentPortal as Portal } from "../../registry/residentApi";
@@ -220,6 +221,10 @@ export function ResidentPortalPage() {
                   You can apply for land below. TAMS allocates residential, farming, business and
                   burial land; you apply for a kind of land and the Land Officer chooses the site.
                 </p>
+                <p>
+                  Further down you will find Community Updates: the council resolutions and
+                  community projects the traditional authority has published.
+                </p>
                 <p style={{ color: "var(--muted)" }}>
                   You never need to send your identity document or proof of address again — they
                   are already on your verified account.
@@ -257,6 +262,15 @@ export function ResidentPortalPage() {
 
       {status === "active"
         ? <div style={{ marginTop: 22 }}><ResidentLand /></div>
+        : null}
+
+      {status === "active"
+        ? (
+          <div style={{ marginTop: 22 }}>
+            <div className="section-heading" style={{ fontSize: 15 }}>Community updates</div>
+            <CommunityUpdates />
+          </div>
+        )
         : null}
 
       {profile?.account_type === "staff"
