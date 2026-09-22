@@ -6,6 +6,7 @@
 // links an account to a record on it.
 
 import { supabase } from "../lib/supabaseClient";
+import { readableError } from "../lib/errorMessage";
 
 export const DOCUMENT_BUCKET = "resident-verification-documents";
 export const MAXIMUM_DOCUMENT_BYTES = 2 * 1024 * 1024;
@@ -69,7 +70,7 @@ export type ResidentResult<T> =
   | { ok: false; code: string; message: string };
 
 function failure(error: { code?: string; message: string }): ResidentResult<never> {
-  const message = (error.message ?? "Something went wrong.").replace(/^[A-Z0-9]{5}:\s*/, "").trim();
+  const message = readableError(error.message);
   if (error.code === "PGRST202") {
     return {
       ok: false,
@@ -135,7 +136,11 @@ async function uploadDocument(
     .from(DOCUMENT_BUCKET)
     .upload(path, file, { contentType: file.type, upsert: false });
 
-  if (error) return { ok: false, code: "upload", message: `${file.name} could not be uploaded: ${error.message}` };
+  if (error) {
+    // Whatever storage said is for the log, not the screen.
+    return { ok: false, code: "upload",
+             message: `${file.name} could not be uploaded. Check the file and your connection, then try again.` };
+  }
 
   return {
     ok: true,

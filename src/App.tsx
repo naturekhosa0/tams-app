@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { SessionProvider } from "./auth/SessionProvider";
+import { IdleTimeoutGuard } from "./auth/IdleTimeoutGuard";
 import {
   RequireAccount, RequireAdministrator, RequireCouncilSecretary, RequireLandOfficer,
   RequireRegistryClerk, RequireResident, RequireStaff, RequireStaffOrResident,
@@ -78,6 +79,7 @@ export default function App() {
   return (
     <SessionProvider>
       <BrowserRouter>
+        <IdleTimeoutGuard />
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<SignIn />} />

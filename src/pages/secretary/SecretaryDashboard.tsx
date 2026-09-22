@@ -126,25 +126,13 @@ export function SecretaryDashboard() {
               </div>
 
               <div className="card">
-                <h2 className="card-title">How the council record works</h2>
-                <div className="bullet-list">
-                  <p>
-                    A meeting is scheduled, then recorded as held or cancelled. A cancelled meeting
-                    always says why, and is kept.
-                  </p>
-                  <p>
-                    Minutes are drafted, and finalised once the council has confirmed them in the
-                    room. Final minutes are locked: a mistake is corrected by an amendment shown
-                    beside them, never by rewriting them.
-                  </p>
-                  <p>
-                    A public resolution reaches residents only once the minutes of its meeting are
-                    final. A public project reaches them straight away.
-                  </p>
-                  <p style={{ color: "var(--muted)" }}>
-                    "Overdue" is never something you set. A milestone is overdue the moment its due
-                    date passes without it being finished.
-                  </p>
+                <h2 className="card-title">Quick actions</h2>
+                <div className="quick-actions">
+                  <Link to="/secretary/meetings" className="btn btn-primary">Meetings</Link>
+                  <Link to="/secretary/resolutions" className="btn btn-ghost">Resolutions</Link>
+                  <Link to="/secretary/projects" className="btn btn-ghost">Projects</Link>
+                  <Link to="/secretary/communications/new" className="btn btn-ghost">Send a communication</Link>
+                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>

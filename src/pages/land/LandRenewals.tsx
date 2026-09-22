@@ -36,7 +36,7 @@ export function LandRenewals() {
     <AppShell>
       <PageHead
         title="Renewal requests"
-        description="Approving a renewal issues a brand new permission and keeps the old one on record as renewed. Nothing is overwritten, and the site does not change."
+        description="Requests to renew a farming or business permission."
         crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Renewals" }]}
         actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
       />
@@ -72,7 +72,7 @@ export function LandRenewals() {
                 </thead>
                 <tbody>
                   {rows.length === 0
-                    ? <tr><td className="empty-row" colSpan={8}>Nothing here.</td></tr>
+                    ? <tr><td className="empty-row" colSpan={8}>No renewal requests are waiting.</td></tr>
                     : rows.map((row) => (
                       <tr key={row.renewal_request_id}>
                         <td className="no-wrap">{row.pto_number}</td>

@@ -46,7 +46,7 @@ export function SendCommunication() {
     <AppShell>
       <PageHead
         title="Send a notice"
-        description="An announcement to the whole community, or an official notice to one resident or a few."
+        description="An announcement to the community, or a notice to named residents."
         crumbs={[
           { label: "Dashboard", to: "/secretary" },
           { label: "Communications", to: "/secretary/communications" },

@@ -1,4 +1,5 @@
 import { useSession } from "../auth/SessionProvider";
+import { Link } from "react-router-dom";
 import { AppShell } from "../components/AppShell";
 import { StatusBadge } from "../components/ui";
 import { formatDateTime } from "../lib/format";
@@ -55,19 +56,20 @@ export function StaffHome() {
         </div>
 
         <div className="card">
-          <h2 className="card-title">Coming next</h2>
+          <h2 className="card-title">Your work area</h2>
           <div className="bullet-list">
             <p>
-              Your <strong>{profile.role_name}</strong> functions have not been added yet.
+              No work area is assigned to the <strong>{profile.role_name}</strong> role.
+              Your account is active and in good standing.
             </p>
             <p style={{ color: "var(--muted)" }}>
-              Your account is set up correctly and you hold exactly one role. When the{" "}
-              {profile.role_name} work is built, it will appear in the menu above — you will not
-              need a new account or a new password.
+              If you expected to see one, or any of your details above are wrong, ask the
+              Council Administrator.
             </p>
-            <p style={{ color: "var(--muted)" }}>
-              If any of your details are wrong, ask the Council Administrator to correct them.
-            </p>
+          </div>
+          <div className="quick-actions" style={{ marginTop: 18 }}>
+            <Link to="/messages" className="btn btn-ghost">Messages</Link>
+            <Link to="/notifications" className="btn btn-ghost">Notifications</Link>
           </div>
         </div>
       </div>

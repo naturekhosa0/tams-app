@@ -75,7 +75,7 @@ export function StaffAccounts() {
     <AppShell>
       <PageHead
         title="Staff accounts"
-        description="Every staff member, their single current role and whether they can currently access the system."
+        description="Every staff member, their role and whether they can sign in."
         crumbs={[{ label: "Dashboard", to: "/dashboard" }, { label: "Staff accounts" }]}
         actions={
           <>

@@ -60,7 +60,7 @@ export function Projects() {
     <AppShell>
       <PageHead
         title="Projects"
-        description="What the community is building. A project may come out of a resolution or stand on its own, and only a public one is shown to residents."
+        description="What the community is building, and how far along it is."
         crumbs={[{ label: "Dashboard", to: "/secretary" }, { label: "Projects" }]}
         actions={
           <>

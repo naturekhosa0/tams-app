@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useSession } from "../../auth/SessionProvider";
 import { homeFor } from "../../components/navigation";
+import { appDisplayHost, ptoVerificationUrl } from "../../lib/appUrl";
 import { QrCode } from "../../components/QrCode";
 import { Loading, Notice } from "../../components/ui";
 import { formatDate } from "../../lib/format";
@@ -54,7 +55,9 @@ export function PtoDocumentPage() {
   }
   if (!document_) return <Loading what="Loading the permission" />;
 
-  const verificationUrl = `${window.location.origin}/verify/pto/${document_.verification_token}`;
+  // The printed address must be the deployed one, not whichever
+  // machine the document happened to be printed from.
+  const verificationUrl = ptoVerificationUrl(document_.verification_token);
 
   return (
     <div className="page">
@@ -110,7 +113,7 @@ export function PtoDocumentPage() {
             <div className="lineage-heading" style={{ marginTop: 10 }}>Verify this document</div>
             <div className="certificate-token">{document_.verification_token.slice(0, 16)}…</div>
             <p className="muted-note" style={{ marginTop: 8, fontSize: 11 }}>
-              Scan the code, or go to {window.location.host}/verify/pto and enter the reference.
+              Scan the code, or go to {appDisplayHost()}/verify/pto and enter the reference.
             </p>
           </div>
         </section>

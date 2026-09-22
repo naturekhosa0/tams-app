@@ -22,8 +22,7 @@ export function Landing() {
 
         <h1>Traditional Authority<br />Management System</h1>
         <p>
-          The traditional authority's records: the village register, land and permissions to
-          occupy, the council's own minutes and resolutions, and what the community is told.
+          The village register, land and permissions to occupy, and the council's record.
         </p>
 
         <div className="row">
@@ -31,19 +30,11 @@ export function Landing() {
             Sign in
           </button>
           <button type="button" className="btn btn-ghost" onClick={() => navigate("/register")}>
-            Create a resident account
+            Create account
           </button>
         </div>
 
         <div className="landing-links">
-          <p>
-            <strong>Staff</strong> — the Council Administrator creates your account and invites
-            you by email. <Link to="/auth">Sign in</Link> once you have set your password.
-          </p>
-          <p>
-            <strong>Residents</strong> — <Link to="/register">create an account</Link>, send your
-            details to be verified, and then apply for land and read the community updates.
-          </p>
           <p>
             <strong>Checking a permission to occupy?</strong>{" "}
             <Link to="/verify/pto">Verify a PTO</Link> using the reference on the document, or

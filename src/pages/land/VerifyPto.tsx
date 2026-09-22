@@ -74,7 +74,7 @@ export function VerifyPto() {
               </p>
               <div className="input-with-button">
                 <input value={typed} aria-label="Verification reference"
-                       placeholder="The reference printed under the code"
+                       placeholder="Reference from the document"
                        onChange={(event) => setTyped(event.target.value)} />
                 <button type="submit" className="btn btn-primary" disabled={!typed.trim()}>
                   Check

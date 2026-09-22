@@ -40,7 +40,7 @@ export function Communications() {
     <AppShell>
       <PageHead
         title="Communications"
-        description="Official notices sent to residents. Nothing sent is ever deleted."
+        description="Announcements and official notices sent to residents."
         crumbs={[{ label: "Dashboard", to: "/secretary" }, { label: "Communications" }]}
         actions={
           <>

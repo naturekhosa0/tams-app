@@ -79,21 +79,13 @@ export function AdminDashboard() {
               </div>
 
               <div className="card">
-                <h2 className="card-title">What you can do right now</h2>
-                <div className="bullet-list">
-                  <p>
-                    <Link to="/staff/new">Create a staff account</Link>{" "}
-                    and assign exactly one role. The person gets an email invitation and chooses
-                    their own password.
-                  </p>
-                  <p>
-                    <Link to="/staff">View all staff accounts</Link>{" "}
-                    with their current role, search and filters.
-                  </p>
-                  <p style={{ color: "var(--muted)" }}>
-                    The Council Administrator role itself is managed separately and cannot be given
-                    out through normal staff creation.
-                  </p>
+                <h2 className="card-title">Quick actions</h2>
+                <div className="quick-actions">
+                  <Link to="/staff/new" className="btn btn-primary">Create a staff account</Link>
+                  <Link to="/staff" className="btn btn-ghost">Staff accounts</Link>
+                  <Link to="/admin/audit" className="btn btn-ghost">Audit trail</Link>
+                  <Link to="/admin/transfer" className="btn btn-ghost">Transfer administrator</Link>
+                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>

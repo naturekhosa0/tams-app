@@ -47,7 +47,7 @@ export function LandSites() {
     <AppShell>
       <PageHead
         title="Land sites"
-        description="Every site TAMS knows about. A site has one kind of land, and only an available site can be allocated."
+        description="Every site on the village land, and its current standing."
         crumbs={[{ label: "Dashboard", to: "/land" }, { label: "Land sites" }]}
         actions={
           <>

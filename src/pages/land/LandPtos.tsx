@@ -41,7 +41,7 @@ export function LandPtos() {
     <AppShell>
       <PageHead
         title="Permissions to occupy"
-        description="Residential and burial permissions are perpetual and carry no expiry date at all. Farming runs for five years and business for two — a lapsed permission is one whose expiry date has passed, worked out from the date, not from a nightly job."
+        description="Every permission to occupy TAMS has issued, current and lapsed."
         crumbs={[{ label: "Dashboard", to: "/land" }, { label: "PTOs" }]}
         actions={<Link to="/land" className="btn btn-ghost">Back to dashboard</Link>}
       />
@@ -83,7 +83,7 @@ export function LandPtos() {
                 </thead>
                 <tbody>
                   {rows.length === 0
-                    ? <tr><td className="empty-row" colSpan={8}>Nothing here.</td></tr>
+                    ? <tr><td className="empty-row" colSpan={8}>No permissions to occupy match.</td></tr>
                     : rows.map((row) => (
                       <tr key={row.pto_id}>
                         <td className="no-wrap">{row.pto_number}</td>

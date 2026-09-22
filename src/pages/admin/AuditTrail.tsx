@@ -90,7 +90,7 @@ export function AuditTrail() {
     <AppShell>
       <PageHead
         title="Audit trail"
-        description="Who changed what, when, from what, to what, and why. Nothing here can be edited or removed."
+        description="Who changed what, when, from what, to what, and why."
         crumbs={[{ label: "Dashboard", to: "/dashboard" }, { label: "Audit trail" }]}
         actions={
           <>

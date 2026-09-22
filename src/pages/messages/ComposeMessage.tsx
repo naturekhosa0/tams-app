@@ -49,7 +49,7 @@ export function ComposeMessage() {
     <AppShell>
       <PageHead
         title="Write a message"
-        description="For coordination between the roles — a clarification, a handover, or a request for another role to do its part."
+        description="Send a message or a work request to another member of staff."
         crumbs={[
           { label: "Home", to: home },
           { label: "Messages", to: "/messages" },

@@ -4,7 +4,7 @@
 npm run test:all        # typecheck + edge function rules + database rules
 ```
 
-## `npm test` — the edge function, worker, navigation and import rules (152 tests)
+## `npm test` — the edge function, worker, navigation, copy and session rules (233 tests)
 
 Each edge function keeps its decisions in a `handler.ts` that takes
 everything it needs through a small set of ports, so the rules can be
@@ -55,9 +55,34 @@ run without Deno or a Supabase project. `tests/` covers:
   problem Supabase reports about a stale link being read out of it, the
   reset making exactly three calls and mentioning no TAMS table, the
   audit event carrying no values at all, and the invitation and
-  registration flows being untouched.
+  registration flows being untouched;
+* **the inactivity timeout** — thirty minutes for staff and sixty for a
+  resident, an unrecognised account type getting the shorter of the two
+  rather than the longer, the warning two minutes out, the countdown's
+  wording, the throttle on how often activity is written down, two tabs
+  agreeing with each other, a stored time from the future being
+  ignored, the sign-out reaching every tab, and the fact that a
+  background poll, a tab regaining focus and the timeout's own clock
+  are none of them treated as somebody using the system;
+* **what a refusal says** — TAMS's own wording passed through exactly,
+  a SQLSTATE stripped, and every shape PostgreSQL uses to talk to a
+  developer (a constraint name, a relation, a schema-cache miss, a
+  stack trace) replaced before it can reach a page;
+* **the writing** — that no page explains how the application works,
+  that the landing page offers two ways in and keeps only the PTO
+  explanation, that every dashboard has quick actions rather than a
+  tutorial, and that no list falls back to "No data";
+* **alignment** — that every control takes its height from one shared
+  token, that a button matches the controls beside it, and that filter
+  rows align to the top so a hint cannot shift its neighbours;
+* **accessibility** — a hint and an error tied to their control even
+  through a wrapper, a caller's own attributes never overwritten, and
+  the mobile menu saying whether it is open;
+* **secrets** — every tracked file scanned for anything shaped like a
+  real key, and `.env` proved untracked. This one exists because a
+  working worker secret was once pasted into the setup guide.
 
-## `npm run test:db` — the database rules (708 tests)
+## `npm run test:db` — the database rules (736 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -180,3 +205,18 @@ Supabase Auth itself — sending the invitation email, the link in it, and
 `updateUser({ password })` — cannot be exercised here. The checklist at
 the end of [SETUP.md](SETUP.md) walks through those against your own
 project.
+
+* `11_password_reset_tests.sql` — changing every account's password and
+  then proving that `user_accounts`, `staff` and `residents` are
+  byte-for-byte what they were, that a deactivated clerk with a new
+  password is still refused, and that no password, token or link
+  reached the audit trail.
+* `12_final_hardening_tests.sql` — the shape of the schema itself,
+  rather than any one feature: Row Level Security on every table,
+  forced on every table but `audit_logs` and the reason that one is
+  not, no write policy or write grant for any client role, `verify_pto`
+  as the only function a signed-out visitor may call, a pinned search
+  path on all 166 security definer functions, the audit trail's
+  immutability, twelve impossible states in the register proved still
+  impossible over the whole imported village, and the audit trail
+  scanned again for anything private.

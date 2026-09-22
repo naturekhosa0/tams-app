@@ -217,17 +217,9 @@ export function ResidentPortalPage() {
             ? (
               <div className="bullet-list">
                 <p>Your account is verified and linked to your record on the village register.</p>
-                <p>
-                  You can apply for land below. TAMS allocates residential, farming, business and
-                  burial land; you apply for a kind of land and the Land Officer chooses the site.
-                </p>
-                <p>
-                  Further down you will find Community Updates: the council resolutions and
-                  community projects the traditional authority has published.
-                </p>
                 <p style={{ color: "var(--muted)" }}>
-                  You never need to send your identity document or proof of address again — they
-                  are already on your verified account.
+                  Your identity document and proof of address are already on file. You will not
+                  be asked for them again.
                 </p>
               </div>
             )

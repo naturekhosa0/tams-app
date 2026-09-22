@@ -113,26 +113,14 @@ export function LandDashboard() {
               </div>
 
               <div className="card">
-                <h2 className="card-title">How land works here</h2>
-                <div className="bullet-list">
-                  <p>
-                    Four kinds of land are allocated: residential, farming, business and burial.
-                    Grazing land is not allocated and no permission is issued for it.
-                  </p>
-                  <p>
-                    An applicant must be 21 or older, on the village register, and must not already
-                    hold that kind of land. The rules are rechecked when you approve and again
-                    when you allocate.
-                  </p>
-                  <p>
-                    Residential and burial permissions are perpetual. Farming runs for five years
-                    and business for two, and both can be renewed — a renewal issues a new
-                    permission and keeps the old one on record.
-                  </p>
-                  <p style={{ color: "var(--muted)" }}>
-                    Nobody countersigns your decision. What you record here is what the Traditional
-                    Authority has decided.
-                  </p>
+                <h2 className="card-title">Quick actions</h2>
+                <div className="quick-actions">
+                  <Link to="/land/applications" className="btn btn-primary">Applications</Link>
+                  <Link to="/land/sites" className="btn btn-ghost">Land sites</Link>
+                  <Link to="/land/allocations" className="btn btn-ghost">Allocations</Link>
+                  <Link to="/land/ptos" className="btn btn-ghost">Permissions to occupy</Link>
+                  <Link to="/land/renewals" className="btn btn-ghost">Renewals</Link>
+                  <Link to="/messages" className="btn btn-ghost">Messages</Link>
                 </div>
               </div>
             </div>
