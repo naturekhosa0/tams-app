@@ -8,6 +8,8 @@ import { isConfigured } from "./lib/supabaseClient";
 import { Landing } from "./pages/Landing";
 import { SignIn } from "./pages/SignIn";
 import { SetPassword } from "./pages/SetPassword";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
 import { AdminDashboard } from "./pages/AdminDashboard";
 import { StaffAccounts } from "./pages/StaffAccounts";
 import { CreateStaffAccount } from "./pages/CreateStaffAccount";
@@ -80,6 +82,8 @@ export default function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<SignIn />} />
           <Route path="/set-password" element={<SetPassword />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/no-access" element={<NoAccess />} />
           <Route path="/register" element={<Register />} />
 

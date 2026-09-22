@@ -18,6 +18,7 @@ immutable audit trail, and handing the administrator role over.
 | **Sign in** | One page for every role, checked against the database record, not the browser. |
 | **Create Staff Account** | The Council Administrator invites a Registry Clerk, Land Officer or Council Secretary. |
 | **Invitation** | The new staff member gets an email and chooses their own password. |
+| **Forgot password** | Residents and every staff role reset a forgotten password through Supabase Auth. |
 | **Staff sign-in** | All three roles can sign in and see their own account page. |
 | **Change staff role** | The Council Administrator moves a staff member to a different one of the three ordinary roles. |
 | **Deactivate / reactivate** | Access is withdrawn and given back, with a reason, without deleting anything. |
@@ -145,7 +146,8 @@ supabase/migrations/      the foundation, staff management, village records,
                           registry clerk, relationship history, resident accounts,
                           land model, land functions, council records,
                           council functions, notifications, audit trail,
-                          communications, administrator transfer
+                          communications, administrator transfer,
+                          password reset audit
 data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
                           manage-staff-account, process-notification-emails,
@@ -156,7 +158,8 @@ scripts/                  one-time administrator bootstrap, legacy import
 docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
                           REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md, LAND.md,
                           COUNCIL-SECRETARY.md, NOTIFICATIONS-AND-EMAIL.md,
-                          AUDIT-AND-ADMINISTRATION.md, NAVIGATION.md
+                          AUDIT-AND-ADMINISTRATION.md, NAVIGATION.md,
+                          PASSWORD-RESET.md
 ```
 
 ## Tests
@@ -165,4 +168,4 @@ docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
 npm run test:all
 ```
 
-819 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+860 automated checks: see [docs/TESTING.md](docs/TESTING.md).

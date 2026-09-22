@@ -4,7 +4,7 @@
 npm run test:all        # typecheck + edge function rules + database rules
 ```
 
-## `npm test` — the edge function, worker, navigation and import rules (125 tests)
+## `npm test` — the edge function, worker, navigation and import rules (152 tests)
 
 Each edge function keeps its decisions in a `handler.ts` that takes
 everything it needs through a small set of ports, so the rules can be
@@ -48,9 +48,16 @@ run without Deno or a Supabase project. `tests/` covers:
   secret back;
 * navigation — where each role's home is, what each role is offered,
   that no role is offered another role's area, and that every navigation
-  link and every role's home is a route the application actually serves.
+  link and every role's home is a route the application actually serves;
+* forgetting a password — the shared password rules, the answer that
+  never says whether an address has an account, the redirect address
+  being configured or the browser's own rather than hard-coded, the
+  problem Supabase reports about a stale link being read out of it, the
+  reset making exactly three calls and mentioning no TAMS table, the
+  audit event carrying no values at all, and the invitation and
+  registration flows being untouched.
 
-## `npm run test:db` — the database rules (694 tests)
+## `npm run test:db` — the database rules (708 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -149,6 +156,17 @@ Each suite reads as a list of the rules themselves:
   once with deactivation, always leaving exactly one active
   administrator, and emergency recovery refuses until there is none and
   refuses again once there is one.
+* `11_password_reset_tests.sql` — the boundary around a password
+  change. Every account in the system changes its password at once, and
+  every field of `user_accounts`, every resident's household and status
+  and every staff member's role are then proved to be exactly what they
+  were; a deactivated clerk with a new password is still refused
+  everywhere; there is no trigger of ours on the table Supabase keeps
+  passwords in, so all those resets wrote no audit between them; the one
+  line the reset page can ask for names the caller's own account and
+  holds no values at all; the function takes no parameters, so nothing
+  can be claimed; and no audited field anywhere in the trail is even
+  named like a password or a token.
 * `04_legacy_import_tests.sql` — the legacy import. Every validation is
   given a dataset that breaks exactly one rule, and each one must write
   nothing at all; then the real CSV package is imported through the same
