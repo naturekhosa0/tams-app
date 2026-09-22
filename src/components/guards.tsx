@@ -42,6 +42,18 @@ export function RequireRegistryClerk({ children }: { children: ReactNode }) {
   return <>{children}</>;
 }
 
+/** Requires an active Land Officer. */
+export function RequireLandOfficer({ children }: { children: ReactNode }) {
+  const { loading, session, profile } = useSession();
+  const location = useLocation();
+
+  if (loading) return <Loading what="Checking your account" />;
+  if (!session) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
+  if (!profile || !profile.access_granted) return <Navigate to="/no-access" replace />;
+  if (profile.role_name !== "Land Officer") return <Navigate to={homePathFor(profile)} replace />;
+  return <>{children}</>;
+}
+
 /** Requires a signed-in resident account, whatever its verification. */
 export function RequireResident({ children }: { children: ReactNode }) {
   const { loading, session, profile } = useSession();
@@ -51,5 +63,19 @@ export function RequireResident({ children }: { children: ReactNode }) {
   if (!session) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
   // A staff member who wanders in is sent to their own area.
   if (profile && profile.account_type !== "resident") return <Navigate to={homePathFor(profile)} replace />;
+  return <>{children}</>;
+}
+
+/**
+ * Requires nothing more than a signed-in account — staff or resident.
+ * Used for the permission-to-occupy document, where the database
+ * decides which one the caller may actually see.
+ */
+export function RequireStaffOrResident({ children }: { children: ReactNode }) {
+  const { loading, session } = useSession();
+  const location = useLocation();
+
+  if (loading) return <Loading what="Checking your account" />;
+  if (!session) return <Navigate to="/auth" replace state={{ from: location.pathname }} />;
   return <>{children}</>;
 }

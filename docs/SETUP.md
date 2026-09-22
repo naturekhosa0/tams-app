@@ -25,7 +25,7 @@ npx supabase link --project-ref <your-project-ref>
 npm run db:push
 ```
 
-That applies both migrations:
+That applies every migration:
 
 * `20260919090000_tams_foundation.sql` — the three tables, the four
   seeded roles, and Row Level Security.
@@ -43,6 +43,15 @@ That applies both migrations:
 * `20260924090000_resident_accounts.sql` — resident accounts,
   verification requests, their documents, and the private storage
   bucket the documents live in.
+* `20260925090000_land_model.sql` — the land model: grazing removed as a
+  kind of land TAMS allocates (existing grazing rows, if any, are kept
+  as legacy records and never deleted), land applications, the extended
+  land allocations, permissions to occupy, renewal requests, and the
+  unique indexes that make the allocation limits impossible to break.
+* `20260926090000_land_functions.sql` — eligibility, the resident's land
+  portal, and every Land Officer function: sites, applications,
+  allocation, issuing, renewal, revocation, release, burial status,
+  succession, and the public verification of a permission.
 
 If a page reports that a function is "not found in the schema cache", a
 migration has not reached the project yet — run
@@ -254,6 +263,33 @@ Council Administrator's own account.
 | 48 | Record a spouse without a date | Refused; a start date is required |
 | 49 | Record a spouse with a start date, then **End** it | Moves to **Former spouse**, with both dates, on both people |
 | 50 | Record the same spouse again with a later date | A second episode; the first stays under Former |
+
+### Checking land end to end
+
+Sign in as a **Land Officer** for 51–62, and as a verified **resident**
+for the rest.
+
+| # | Check | Expected |
+| --- | --- | --- |
+| 51 | Open `/land` | The Land Officer dashboard, with counts |
+| 52 | **Land sites** → **Register a site** | Only residential, farming, business and burial are offered — no grazing |
+| 53 | Register `RES-9001` as residential | Listed as **available** |
+| 54 | Register `RES-9001` again | Refused: the site code is already in use |
+| 55 | As a resident, apply for residential land | No site picker anywhere; no document upload |
+| 56 | Apply again for residential land | Refused: an application is already open |
+| 57 | As the officer, open the application | The applicant, household, land already held, and the eligibility check |
+| 58 | **Decline** with no reason | Refused |
+| 59 | **Approve**, then allocate `RES-9001` | Site becomes **allocated**, application **allocated** |
+| 60 | **Issue the permission** | A PTO number; expiry shows **Perpetual** |
+| 61 | Open the document, print preview | The certificate only — no buttons, no navigation |
+| 62 | Scan the QR code with a phone | The public page, showing valid — and no identity number or birth date |
+| 63 | Open `/verify/pto/<wrong-token>` signed out | "No permission to occupy matches this code" |
+| 64 | As the resident, look at **My permissions** | The residential PTO, with no **Renew** button |
+| 65 | Repeat 55–60 for **business** land | Expiry is exactly two years from today |
+| 66 | As the resident, **Renew** the business PTO | Sent; a second request is refused |
+| 67 | As the officer, **Renewals** → **Approve** | A *new* PTO number; the old one now reads **renewed** |
+| 68 | As a Registry Clerk, open `/land` | Sent away; the API returns `403` |
+| 69 | As a resident, open `/land/applications` | Sent away; the API returns `403` |
 
 ### If the invitation email fails
 

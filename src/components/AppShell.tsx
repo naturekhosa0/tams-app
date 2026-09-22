@@ -8,6 +8,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { profile, signOut } = useSession();
   const isAdministrator = profile?.is_council_administrator ?? false;
   const isRegistryClerk = profile?.role_name === "Registry Clerk";
+  const isLandOfficer = profile?.role_name === "Land Officer";
 
   return (
     <div className="page">
@@ -37,6 +38,19 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <NavLink to="/registry/households" className={({ isActive }) => isActive ? "active" : ""}>Households</NavLink>
                 <NavLink to="/registry/lineage" className={({ isActive }) => isActive ? "active" : ""}>Family lineage</NavLink>
                 <NavLink to="/registry/resident-accounts" className={({ isActive }) => isActive ? "active" : ""}>Resident accounts</NavLink>
+                <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
+              </>
+            )
+            : isLandOfficer
+            ? (
+              <>
+                <NavLink to="/land" end className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
+                <NavLink to="/land/applications" className={({ isActive }) => isActive ? "active" : ""}>Applications</NavLink>
+                <NavLink to="/land/sites" className={({ isActive }) => isActive ? "active" : ""}>Land sites</NavLink>
+                <NavLink to="/land/allocations" className={({ isActive }) => isActive ? "active" : ""}>Allocations</NavLink>
+                <NavLink to="/land/ptos" className={({ isActive }) => isActive ? "active" : ""}>PTOs</NavLink>
+                <NavLink to="/land/renewals" className={({ isActive }) => isActive ? "active" : ""}>Renewals</NavLink>
+                <NavLink to="/land/succession" className={({ isActive }) => isActive ? "active" : ""}>Succession</NavLink>
                 <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
               </>
             )

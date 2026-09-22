@@ -328,7 +328,7 @@ select tams_test.run_as('service_role', null, $sql$
                                  village_section, village_name, site_status)
   values ('RES-0021', 'residential', 'ST-1021', '73 Baobab Close', 'Central',
           'Mhinga Village', 'allocated'),
-         ('GRAZE-001', 'grazing', null, 'Common grazing land', 'North',
+         ('BUR-001', 'burial', null, 'Village burial ground', 'North',
           'Mhinga Village', 'allocated')
 $sql$);
 
@@ -362,7 +362,7 @@ select tams_test.check(
 select tams_test.check(
   'HOUSEHOLD 18a — a site that is not residential is refused',
   tams_test.run_as('authenticated', tams_test.clerk(), $sql$
-    select public.registry_create_household('HH-0098', tams_test.site_id_of('GRAZE-001'), 'active')
+    select public.registry_create_household('HH-0098', tams_test.site_id_of('BUR-001'), 'active')
   $sql$) = 'TA036'
 );
 
@@ -377,7 +377,7 @@ select tams_test.check(
   'HOUSEHOLD 18c — an occupied site is not offered as available',
   tams_test.query_as('authenticated', tams_test.clerk(),
     $sql$select count(*)::text from public.registry_available_residential_sites()
-         where site_code in ('RES-0001', 'RES-0021', 'GRAZE-001')$sql$) = '0'
+         where site_code in ('RES-0001', 'RES-0021', 'BUR-001')$sql$) = '0'
 );
 
 

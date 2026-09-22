@@ -151,3 +151,10 @@ works out the caller from `auth.uid()`.
 An applicant therefore cannot approve themselves, choose their own
 matched resident, set a request to approved, write a reviewer, or touch
 `account_status` or `resident_id` directly. Each of those is a test.
+
+## What an active resident account can then do
+
+Once the account is active and linked, the resident's portal also shows
+their land: what they may apply for, what they have applied for, what
+has been allocated to them, and their permissions to occupy. See
+[LAND.md](LAND.md).

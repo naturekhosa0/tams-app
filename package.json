@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "description": "Traditional Authority Management System (TAMS) \u2014 foundation: staff accounts, roles and authentication.",
+  "description": "Traditional Authority Management System (TAMS) — staff accounts, the village register, resident accounts, land and permissions to occupy.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
+    "qrcode-generator": "^2.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.26.2"

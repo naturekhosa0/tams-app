@@ -1,13 +1,12 @@
 # TAMS — Traditional Authority Management System
 
-The foundation of the system: staff roles, staff accounts and signing in.
 Built with React, Vite, Supabase (PostgreSQL, Supabase Auth and Row Level
 Security).
 
-The foundation, plus the Council Administrator's staff management.
-Registry Clerk, Land Officer, Council Secretary, resident, land, PTO,
-meeting, project and audit work are **not** built yet — only what those
-later functions will stand on.
+The foundation, the Council Administrator's staff management, the
+Registry Clerk's register, resident accounts, and the Land Officer's
+land, allocations and permissions to occupy. Council Secretary, meeting,
+project and audit work are **not** built yet.
 
 ## What works today
 
@@ -24,6 +23,9 @@ later functions will stand on.
 | **Registry Clerk** | Search and view the register, create and update residents, create households, link residents, designate heads, and record family relationships. |
 | **Relationship history** | Lineage is permanent; marriages and guardianships begin, end and may begin again, each episode kept. |
 | **Resident accounts** | Residents register, send documents to be verified, and are matched by a Registry Clerk to a record already on the register. |
+| **Land applications** | A verified resident applies for residential, farming, business or burial land. They never choose a site. |
+| **Land Officer** | Registers sites, reviews applications, allocates a site, issues the permission to occupy, and handles renewals, revocations and succession. |
+| **Permission to occupy** | A printable document with a QR code, and a public page anyone can use to check that it is genuine. |
 
 ## Getting started
 
@@ -38,13 +40,15 @@ The full walkthrough, including the first administrator, is in
 
 ## The database
 
-Three tables, and nothing that is not needed yet.
+Only the tables the built functions need, and nothing more.
 
 ```
 roles ───< staff ───< user_accounts >─── auth.users
 
 land_sites ───< households ───< residents ───< family_relationships
      └───< land_allocations >─── residents
+
+residents ───< land_applications ───< land_allocations ───< ptos ───< pto_renewal_requests
 ```
 
 * **roles** — the four roles, seeded by the migration: Registry Clerk,
@@ -55,14 +59,18 @@ land_sites ───< households ───< residents ───< family_relation
   `account_status` (`active` / `deactivated`) is the single source of
   truth for whether they may use the system.
 
-`user_accounts.resident_id` is reserved for a later function and is
-unused.
+`user_accounts.resident_id` links a verified resident account to its
+record on the village register.
+
+Land is only ever **residential**, **farming**, **business** or
+**burial**. Grazing land is not allocated by TAMS and no permission to
+occupy is issued for it. See [docs/LAND.md](docs/LAND.md).
 
 The village records came from the legacy import. An active Registry Clerk
 may read all five tables and write to residents, households and family
 relationships through the `registry_*` functions; nobody else can read
 them at all, and nobody can change land sites or land allocations, which
-wait for the Land Officer. A
+are the Land Officer's to change. A
 household is identified by its `household_code`, never by surname, and
 the head of a household is not assumed to be the person the land was
 allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
@@ -72,9 +80,11 @@ allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
 * **The browser holds no secrets and makes no writes.** Only the `anon`
   key is used there, and it can reach only what Row Level Security
   allows.
-* **Row Level Security is on for all three tables**, with no insert,
+* **Row Level Security is on for every table**, with no insert,
   update or delete policy at all. Every write goes through a
-  `security definer` function that only `service_role` may execute.
+  `security definer` function that re-establishes the caller from
+  `auth.uid()` and checks the rules for itself. A signed-in browser may
+  *call* those functions; it cannot reach the tables behind them.
 * **Roles are never trusted from the browser.** Every protected
   operation re-reads, from the database, that the caller has an active
   staff account and what role that account currently holds.
@@ -96,7 +106,8 @@ allocated to. See [docs/LEGACY-IMPORT.md](docs/LEGACY-IMPORT.md).
 ```
 src/                      React app (pages, session, guards)
 supabase/migrations/      the foundation, staff management, village records,
-                          registry clerk, relationship history, resident accounts
+                          registry clerk, relationship history, resident accounts,
+                          land model, land functions
 data/legacy-import/       the village's existing records, as supplied
 supabase/functions/       bootstrap-council-administrator, create-staff-account,
                           manage-staff-account
@@ -104,7 +115,7 @@ supabase/tests/           database test suite (runs on plain PostgreSQL)
 tests/                    edge function rule tests
 scripts/                  one-time administrator bootstrap, legacy import
 docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
-                          REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md
+                          REGISTRY-CLERK.md, RESIDENT-ACCOUNTS.md, LAND.md
 ```
 
 ## Tests
@@ -113,4 +124,4 @@ docs/                     SETUP.md, TESTING.md, LEGACY-IMPORT.md,
 npm run test:all
 ```
 
-413 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+432 automated checks: see [docs/TESTING.md](docs/TESTING.md).
