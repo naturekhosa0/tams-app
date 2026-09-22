@@ -172,11 +172,11 @@ select cron.schedule(
   'tams-notification-emails', '*/5 * * * *',
   $$
   select net.http_post(
-    url     := 'https://<your-project-ref>.supabase.co/functions/v1/process-notification-emails',
+    url     := 'https://xgbokyxaampcefvxnlxi.supabase.co/functions/v1/process-notification-emails',
     headers := jsonb_build_object(
                  'Content-Type', 'application/json',
-                 'Authorization', 'Bearer <your-anon-key>',
-                 'x-worker-secret', '<your TAMS_WORKER_SECRET>'),
+                 'Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhnYm9reXhhYW1wY2VmdnhubHhpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4MTE3MzgsImV4cCI6MjEwNTM4NzczOH0.AdvmT80gLIhlOfRkOMGfUtDjXwrNO2gx8P7hVBQHnTU',
+                 'x-worker-secret', 'si+Ieh3bE4e3fMODmlCLmLkv5wKlFPL7oLJw25a1wA0='),
     body    := '{"limit": 50}'::jsonb);
   $$);
 ```
