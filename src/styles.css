@@ -795,3 +795,5 @@ td.new-value { font-weight: 600; }
   .page-head .row > * { flex: 1 1 auto; text-align: center; }
   .tabs { flex-wrap: wrap; }
 }
+
+.forgot-password-line { margin-top: 14px; text-align: center; font-size: 14px; }

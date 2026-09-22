@@ -3,8 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { homePathFor, useSession } from "../auth/SessionProvider";
 import { supabase } from "../lib/supabaseClient";
 import { Field, Notice } from "../components/ui";
-
-const MINIMUM_PASSWORD_LENGTH = 8;
+import { MINIMUM_PASSWORD_LENGTH, recoveryLinkProblem, validateNewPassword } from "../auth/passwordRules";
 
 /**
  * Where an invitation email lands.
@@ -29,24 +28,18 @@ export function SetPassword() {
   // Supabase sends its own failures back in the URL (expired link, link
   // already used). Read them before anything else is shown.
   useEffect(() => {
-    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-    const query = new URLSearchParams(window.location.search);
-    const description = hash.get("error_description") ?? query.get("error_description");
-    if (description) setLinkError(description.replace(/\+/g, " "));
+    setLinkError(recoveryLinkProblem(window.location.hash, window.location.search));
   }, []);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     setError(null);
 
-    if (password.length < MINIMUM_PASSWORD_LENGTH) {
-      setError(`Your password must be at least ${MINIMUM_PASSWORD_LENGTH} characters.`);
-      return;
-    }
-    if (password !== confirmation) {
-      setError("The two passwords do not match.");
-      return;
-    }
+    // The same rules the reset page applies, so a password chosen from
+    // an invitation is held to exactly the standard one chosen from a
+    // reset link is.
+    const problem = validateNewPassword(password, confirmation);
+    if (problem) { setError(problem); return; }
 
     setSubmitting(true);
     const { error: updateError } = await supabase.auth.updateUser({ password });
@@ -74,6 +67,7 @@ export function SetPassword() {
           </p>
           <div className="row" style={{ justifyContent: "center" }}>
             <Link to="/auth" className="btn btn-primary">Go to sign in</Link>
+            <Link to="/forgot-password" className="btn btn-ghost">Reset my password</Link>
             <Link to="/" className="btn btn-ghost">Back to home</Link>
           </div>
         </div>

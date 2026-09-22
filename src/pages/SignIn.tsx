@@ -110,6 +110,10 @@ export function SignIn() {
           </button>
         </form>
 
+        <p className="forgot-password-line">
+          <Link to="/forgot-password">Forgot password?</Link>
+        </p>
+
         <div className="auth-footer">
           <p>
             Don't have an account? Residents can{" "}
@@ -117,6 +121,10 @@ export function SignIn() {
           </p>
           <p>
             Staff accounts are created by the Council Administrator, who invites you by email.
+          </p>
+          <p>
+            Forgotten your password? <Link to="/forgot-password">Reset it</Link> — residents and
+            staff alike.
           </p>
           <p>
             <Link to="/">Back to home</Link> · <Link to="/verify/pto">Verify a PTO</Link>

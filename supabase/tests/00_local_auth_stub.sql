@@ -26,10 +26,14 @@ $$;
 create schema if not exists auth;
 
 create table if not exists auth.users (
-  id              uuid primary key default gen_random_uuid(),
-  email           text unique,
-  last_sign_in_at timestamptz,
-  created_at      timestamptz not null default now()
+  id                 uuid primary key default gen_random_uuid(),
+  email              text unique,
+  -- Supabase keeps the password here, hashed. TAMS never reads it and
+  -- never writes it; it is in the stub only so the tests can prove that
+  -- changing it moves nothing on the TAMS side.
+  encrypted_password text,
+  last_sign_in_at    timestamptz,
+  created_at         timestamptz not null default now()
 );
 
 -- Supabase derives this from the request JWT; the tests set it directly.
