@@ -52,6 +52,13 @@ That applies every migration:
   portal, and every Land Officer function: sites, applications,
   allocation, issuing, renewal, revocation, release, burial status,
   succession, and the public verification of a permission.
+* `20260927090000_council_records.sql` — the council's own record:
+  meetings, attendance, minutes, amendments to final minutes,
+  resolutions, projects, milestones, and the history of every change of
+  visibility.
+* `20260928090000_council_functions.sql` — Council Secretary
+  authorisation, every function behind those records, the narrow read
+  policies, and the resident's Community Updates.
 
 If a page reports that a function is "not found in the schema cache", a
 migration has not reached the project yet — run
@@ -290,6 +297,37 @@ for the rest.
 | 67 | As the officer, **Renewals** → **Approve** | A *new* PTO number; the old one now reads **renewed** |
 | 68 | As a Registry Clerk, open `/land` | Sent away; the API returns `403` |
 | 69 | As a resident, open `/land/applications` | Sent away; the API returns `403` |
+
+### Checking the Council Secretary end to end
+
+Sign in as a **Council Secretary** for 70–86, and as a verified
+**resident** for 87–91.
+
+| # | Check | Expected |
+| --- | --- | --- |
+| 70 | Sign in as the Council Secretary | You land on `/secretary`; the navigation shows Dashboard, Meetings, Resolutions, Projects |
+| 71 | **Meetings** → **Schedule a meeting** | Only ordinary, special and emergency are offered |
+| 72 | Leave the agenda blank and try to save | The button stays disabled — every field is required |
+| 73 | Schedule an *ordinary* meeting for today | Listed as **scheduled**, with an `MTG-<year>-0001` style reference you did not type |
+| 74 | Open it → **Record as held** | Status becomes **held** |
+| 75 | Add three attendees — a Chief, a Headman, a guest | All three saved; **none of them needed an account** |
+| 76 | Type minutes → **Save draft** | Saved; the dashboard still counts it under *awaiting minutes* |
+| 77 | Reload, edit the draft, save again | The later wording is kept |
+| 78 | **Finalise minutes** → confirm | Green banner naming you and the moment; the text box is gone |
+| 79 | Try to edit the minutes again | There is no way to; the attendance list now says **Closed** |
+| 80 | **Record an amendment** with a blank reason | The button stays disabled |
+| 81 | Record an amendment with both fields | `AMD-<year>-0001` appears beneath the minutes; the minutes above are unchanged |
+| 82 | **Record a resolution**, visibility **public** | `RES-<year>-0001`, decided on the meeting's own date — you never typed a date |
+| 83 | Record a second resolution, **internal** | Both listed against this meeting |
+| 84 | **Withdraw** the internal one with no reason | Refused; with a reason it is kept, marked withdrawn |
+| 85 | **Projects** → **Create a project**, target date *before* the start date | Refused |
+| 86 | Create a public project with a start date a month ago, link the public resolution, then add three milestones — one due last week, one due next week | The past one shows **Overdue** with no action from you; the dashboard's overdue count goes up |
+| 87 | Sign in as a verified resident | The portal, with **Community updates** below your land |
+| 88 | Look at Council resolutions | Only `RES-<year>-0001` — the public one from confirmed minutes |
+| 89 | Look at Community projects | The public project, with ✓ / • / ! against its milestones and **Overdue** on the right one |
+| 90 | Confirm what is **missing** | No attendance, no minutes (draft or final), no internal resolution, no internal project |
+| 91 | Type `/secretary` into the address bar as the resident | Bounced back to `/resident`; the API returns `403` |
+| 92 | As a Registry Clerk or Land Officer, open `/secretary` | Bounced to their own area |
 
 ### If the invitation email fails
 

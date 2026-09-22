@@ -249,7 +249,8 @@ simply reports that nothing matches.
 
 ## 9. Deliberately not built
 
-Notifications, Council Secretary functions, the audit trail,
-Administrator Transfer, individual grave tracking, GIS or mapping,
-payments and fees, and Chief/Headman/Headwoman accounts are **not** part
-of this work.
+Notifications, the audit trail, Administrator Transfer, individual grave
+tracking, GIS or mapping, payments and fees, and Chief/Headman/Headwoman
+accounts are **not** part of this work. (The Council Secretary's
+functions were built afterwards — see
+[COUNCIL-SECRETARY.md](COUNCIL-SECRETARY.md).)

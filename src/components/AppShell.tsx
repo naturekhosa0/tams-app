@@ -9,6 +9,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const isAdministrator = profile?.is_council_administrator ?? false;
   const isRegistryClerk = profile?.role_name === "Registry Clerk";
   const isLandOfficer = profile?.role_name === "Land Officer";
+  const isCouncilSecretary = profile?.role_name === "Council Secretary";
 
   return (
     <div className="page">
@@ -51,6 +52,16 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <NavLink to="/land/ptos" className={({ isActive }) => isActive ? "active" : ""}>PTOs</NavLink>
                 <NavLink to="/land/renewals" className={({ isActive }) => isActive ? "active" : ""}>Renewals</NavLink>
                 <NavLink to="/land/succession" className={({ isActive }) => isActive ? "active" : ""}>Succession</NavLink>
+                <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
+              </>
+            )
+            : isCouncilSecretary
+            ? (
+              <>
+                <NavLink to="/secretary" end className={({ isActive }) => isActive ? "active" : ""}>Dashboard</NavLink>
+                <NavLink to="/secretary/meetings" className={({ isActive }) => isActive ? "active" : ""}>Meetings</NavLink>
+                <NavLink to="/secretary/resolutions" className={({ isActive }) => isActive ? "active" : ""}>Resolutions</NavLink>
+                <NavLink to="/secretary/projects" className={({ isActive }) => isActive ? "active" : ""}>Projects</NavLink>
                 <NavLink to="/home" className={({ isActive }) => isActive ? "active" : ""}>My account</NavLink>
               </>
             )

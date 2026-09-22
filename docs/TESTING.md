@@ -36,7 +36,7 @@ run without Deno or a Supabase project. `tests/` covers:
   lineage is never offered an ending and a remarriage shows both the
   current marriage and the former one.
 
-## `npm run test:db` — the database rules (432 tests)
+## `npm run test:db` — the database rules (552 tests)
 
 Runs the real migration against a throwaway local PostgreSQL database.
 `supabase/tests/00_local_auth_stub.sql` stands in for the parts Supabase
@@ -89,6 +89,27 @@ Each suite reads as a list of the rules themselves:
   than freeing a stand, TAMS naming no heir, returning land to the
   Authority, QR verification showing no identity number or birth date,
   and a resident being refused every officer function there is.
+* `09_council_secretary_tests.sql` — the council record. Who counts as a
+  Council Secretary and who is turned away (a resident, a Registry
+  Clerk, a Land Officer, the Council Administrator, a signed-out
+  visitor, and a Secretary whose account was deactivated); the three
+  kinds of meeting and the refusal of a fourth; unique references; the
+  two status moves allowed and every one that is not; cancellation
+  needing a reason and the meeting surviving it; attendance needing no
+  account of any kind and closing when the minutes go final; one
+  minutes record per meeting; a draft being edited; finalisation
+  recording who and when; final minutes refusing to be edited or
+  deleted; amendments being refused on a draft, required to carry a
+  reason, and leaving the original word for word; several resolutions
+  from one meeting; withdrawal needing a reason; an internal resolution
+  and a public one from unconfirmed minutes both being invisible to a
+  resident; public → internal needing a reason and leaving a history
+  row; projects with and without a resolution; a backwards date order
+  refused; a public project linked to an internal resolution leaking
+  none of it; milestones through pending, in progress and completed;
+  overdue being worked out from the date and refusing to be stored or
+  chosen; and a resident's direct queries against the tables returning
+  exactly the same narrow answer the function gives them.
 * `04_legacy_import_tests.sql` — the legacy import. Every validation is
   given a dataset that breaks exactly one rule, and each one must write
   nothing at all; then the real CSV package is imported through the same
