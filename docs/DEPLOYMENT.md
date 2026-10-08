@@ -72,24 +72,23 @@ npx supabase secrets set TAMS_SITE_URL=https://tams.example.org
 npm run functions:deploy
 ```
 
-## 2. Make the database administrator-only
+## 2. Prepare the clean demonstration database
 
-The deployment switch is reversible and does not delete an account or
-record:
+This route is destructive. It keeps the active Council Administrator account
+and permanently clears every other Auth user, application account and
+operational record:
 
-1. Run `supabase/maintenance/preview_administrator_only.sql` in the
-   Supabase SQL Editor. Continue only when it reports exactly one active
-   Council Administrator.
-2. Run `supabase/maintenance/enable_administrator_only.sql`. It
-   deactivates every other account in one transaction and stores their
-   prior statuses in the private schema.
-3. In **Authentication → Sign In / Providers → Email**, turn **Allow
+1. Run `supabase/maintenance/preview_demonstration_reset.sql` in the Supabase
+   SQL Editor and verify exactly one Council Administrator is marked `KEEP`.
+2. Empty the `resident-verification-documents` bucket through Supabase Storage.
+3. Read, confirm and run `supabase/maintenance/reset_for_demonstration.sql`.
+4. In **Authentication → Sign In / Providers → Email**, turn **Allow
    new users to sign up** off. Supabase then permits existing users to
    sign in but refuses new public sign-ups.
 
-To undo the database switch later, run
-`supabase/maintenance/restore_administrator_only.sql`. Full operating
-instructions are in `supabase/maintenance/README.md`.
+The reset cannot be undone without an external backup. Full operating
+instructions and the separate reversible account-lockdown option are in
+`supabase/maintenance/README.md`.
 
 ## 3. Deploy the front end
 
