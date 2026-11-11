@@ -178,3 +178,6 @@ npm run test:all
 ```
 
 969 automated checks: see [docs/TESTING.md](docs/TESTING.md).
+
+   ## Team
+   - Thabisile Moloi: requirements documentation (SRS) and system design diagrams
